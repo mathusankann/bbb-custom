@@ -4,9 +4,9 @@ public:
     desktopFontSize: 14px
     audioChatNotification: false
     autoJoin: true
-    listenOnlyMode: true
+    listenOnlyMode: false
     forceListenOnly: false
-    skipCheck: false
+    skipCheck: true
     clientTitle: BigBlueButton
     appName: BigBlueButton HTML5 Client
     bbbServerVersion: 2.2
@@ -28,7 +28,7 @@ public:
     mirrorOwnWebcam: false
     viewersInWebcam: 8
     ipv4FallbackDomain: ""
-    allowLogout: true
+    allowLogout: false
     allowFullscreen: true
     remainingTimeThreshold: 30
     remainingTimeAlertThreshold: 1
@@ -90,7 +90,7 @@ public:
       - danger
       - warning
   externalVideoPlayer:
-    enabled: true
+    enabled: false
   networkMonitoring:
     enableNetworkMonitoring: false
     packetLostThreshold: 10
@@ -184,12 +184,12 @@ public:
         name: High definition
         default: false
         bitrate: 800
-    enableScreensharing: true
+    enableScreensharing: false
     enableVideo: true
     enableVideoMenu: true
-    enableListenOnly: true
-    autoShareWebcam: false
-    skipVideoPreview: false
+    enableListenOnly: false
+    autoShareWebcam: true
+    skipVideoPreview: true
     # Entry `thresholds` is an array of:
     # - threshold: minimum number of cameras being shared for profile to applied
     #   profile: a camera profile id from the cameraProfiles configuration array
@@ -244,7 +244,7 @@ public:
     lines: 2
     time: 5000
   chat:
-    enabled: true
+    enabled: false
     bufferChatInsertsMs: 0
     startClosed: false
     min_message_length: 1
@@ -274,7 +274,7 @@ public:
       showControls: true
       rtl: false
   layout:
-    autoSwapLayout: false
+    autoSwapLayout: true
     hidePresentation: false
   media:
     stunTurnServersFetchAddress: "/bigbluebutton/api/stuns"

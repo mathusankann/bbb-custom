@@ -59,6 +59,7 @@
   }
 
   &:first-child {
+    display: none;
     margin-top: 0;
   }
 
@@ -120,6 +121,7 @@
 }
 
 .messages {
+  display: none;
   max-height: 30vh;
 }
 
