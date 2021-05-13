@@ -20,7 +20,7 @@ fi
 
 
 EXTERNAL_IPv4=$(curl -4 -s https://icanhazip.com)
-EXTERNAL_IPv6=$(curl -6 -s -m 10 https://icanhazip.com || true)
+EXTERNAL_IPv6=$(curl -6 -s https://icanhazip.com || true)
 
 greenlight=""
 while [[ ! $greenlight =~ ^(y|n)$ ]]; do
@@ -31,6 +31,14 @@ https_proxy=""
 while [[ ! $https_proxy =~ ^(y|n)$ ]]; do
     read -p "Should an automatic HTTPS Proxy be included? (y/n): " https_proxy
 done
+
+coturn=""
+if [ "$https_proxy" == "y" ]
+then
+    while [[ ! $coturn =~ ^(y|n)$ ]]; do
+        read -p "Should a coturn be included? (y/n): " coturn
+    done
+fi
 
 prometheus_exporter=""
 while [[ ! $prometheus_exporter =~ ^(y|n)$ ]]; do
@@ -106,6 +114,16 @@ then
     sed -i "s/#ENABLE_RECORDING.*/ENABLE_RECORDING=true/" .env
 fi
 
+if [ "$coturn" == "y" ]
+then
+    sed -i "s/.*TURN_SERVER=.*/TURN_SERVER=turns:$DOMAIN:465?transport=tcp/" .env
+    TURN_SECRET=$(head /dev/urandom | tr -dc A-Za-f0-9 | head -c 32)
+    sed -i "s/.*TURN_SECRET=.*/TURN_SECRET=$TURN_SECRET/" .env
+    sed -i "s/.*STUN_IP=.*/STUN_IP=$EXTERNAL_IPv4/" .env
+else
+    sed -i "s/ENABLE_COTURN.*/#ENABLE_COTURN=true/" .env
+fi
+
 if [ "$prometheus_exporter" == "y" ]
 then
     sed -i "s/#ENABLE_PROMETHEUS_EXPORTER.*/ENABLE_PROMETHEUS_EXPORTER=true/" .env
@@ -119,16 +137,11 @@ sed -i "s/SHARED_SECRET=.*/SHARED_SECRET=$RANDOM_1/" .env
 sed -i "s/ETHERPAD_API_KEY=.*/ETHERPAD_API_KEY=$RANDOM_2/" .env
 sed -i "s/RAILS_SECRET=.*/RAILS_SECRET=$RANDOM_3/" .env
 
-./scripts/generate-compose
-
 echo "--------------------------------------------------"
 echo "configuration file .env got successfully created!"
 echo ""
 echo "you can look through it for further adjusments"
 echo "  $ nano .env"
 echo ""
-echo "make sure to recreate the docker-compose.yml after each change"
-echo "  $ ./scripts/generate-compose"
-echo ""
 echo "to start bigbluebutton run"
-echo "  $ docker-compose up -d"
+echo "  $ ./scripts/compose up -d"

@@ -272,7 +272,7 @@
      * LibreOffice can be used in lieu of Abiword to export pads.
      * Setting it to null disables LibreOffice exporting.
      */
-    "soffice": "/etherpad-export.sh",
+    "soffice": null,
   
     /*
      * Path to the Tidy executable.
@@ -433,11 +433,14 @@
   
     /*
      * Delete pads plugin configuration.
+     * npm i ep_delete_after_delay_lite
      */
-    "ep_pad_ttl": {
-      "ttl": 86400, // 24 hours
-      "timeout": 30,
-      "interval": 21600, // 6 hour
+  
+    "ep_delete_after_delay_lite": {
+      "delay": 86400, // one day, in seconds
+      "loop": true,
+      "loopDelay": 3600, // one hour, in seconds
+      "deleteAtStart": true
     },
   
     /*
@@ -458,24 +461,6 @@
     },
     */
   
-
-    /*
-      * From Etherpad 1.9.0 onwards, when Etherpad is in production mode commits from individual users are rate limited
-      *
-      * The default is to allow at most 10 changes per IP in a 1 second window.
-      * After that the change is rejected.
-      *
-      * See https://github.com/animir/node-rate-limiter-flexible/wiki/Overall-example#websocket-single-connection-prevent-flooding for more options
-      */
-    "commitRateLimiting": {
-      // duration of the rate limit window (seconds)
-      "duration": 1,
-  
-      // maximum number of chanes per IP to allow during the rate limit window
-      "points": 100
-    },
-  
-    
     /*
      * Toolbar buttons configuration.
      *

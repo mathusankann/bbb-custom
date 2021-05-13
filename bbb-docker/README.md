@@ -1,16 +1,20 @@
-# 📦 BigBlueButton 2.3 Docker
+# BigBlueButton 2.2 Docker
 
-Version: 2.3.0 | [Changelog](CHANGELOG.md) | [Issues](https://github.com/bigbluebutton/docker/issues)
+[Changelog](CHANGELOG.md) | [Issues](https://github.com/alangecker/bigbluebutton-docker/issues)
+
+## About the upcoming BigBlueButton 2.3
+the `v2.3.x` branch became now `develop` at the official [bigbluebutton/docker](https://github.com/bigbluebutton/docker) repository :tada:
+- If you want to support the development, check out that repo! :)
+- If you want a stable release, stay here!
+
 
 ## Features
 - Easy installation
 - Greenlight included
+- TURN server included
 - Fully automated HTTPS certificates
+- Runs on almost any major linux distributon (Debian, Ubuntu, CentOS,...)
 - Full IPv6 support
-- Runs on any major linux distributon (Debian, Ubuntu, CentOS,...)
-
-## What is not implemented yet
-- bbb-lti
 
 ## Install
 1. Install docker-ce & docker-compose
@@ -21,34 +25,30 @@ Version: 2.3.0 | [Changelog](CHANGELOG.md) | [Issues](https://github.com/bigblue
         * Ubuntu: https://docs.docker.com/engine/install/ubuntu/
     2. Ensure docker works with `$ docker run hello-world`
     3. Install docker-compose: https://docs.docker.com/compose/install/
-    4. Ensure docker-compose works and that you use a version ≥ 1.28 : `$ docker-compose --version`
-2. Clone this repository
+    4. Ensure docker-compose works: `$ docker-compose --version`
+5. Clone this repository
    ```sh
-   $ git clone -b main --recurse-submodules https://github.com/bigbluebutton/docker.git bbb-docker
+   $ git clone --recurse-submodules https://github.com/alangecker/bigbluebutton-docker.git bbb-docker
    $ cd bbb-docker
    ```
-3. Run setup:
+6. Run setup:
    ```bash
    $ ./scripts/setup
    ```
-4. (optional) Make additional configuration adjustments
-   ```bash
-   $ nano .env
-   # always recreate the docker-compose.yml file after making any changes
-   $ ./scripts/generate-compose
-   ```
-5. Start containers:
+7. Start containers:
     ```bash
-    $ docker-compose up -d
+    $ ./scripts/compose up -d
     ```
-6. If you use greenlight, you can create an admin account with:
+8. If you use greenlight, you can create an admin account with:
     ```bash
-    $ docker-compose exec greenlight bundle exec rake admin:create
+    $ ./scripts/compose exec greenlight bundle exec rake admin:create
     ```
 
-## Further How-To's
-- [Upgrading](docs/upgrading.md)
-- [Running behind NAT](docs/behind-nat.md)
+## How-To's
+- [Upgrade](docs/upgrading.md)
+- [Behind NAT](docs/behind-nat.md)
 - [BBB-Docker Development](docs/development.md)
 - [Integration into an existing web server](docs/existing-web-server.md)
 
+## Special thanks to
+- @dkrenn, whos dockerized version (bigbluebutton#8858)(https://github.com/bigbluebutton/bigbluebutton/pull/8858) helped me a lot in understand and some configs.
