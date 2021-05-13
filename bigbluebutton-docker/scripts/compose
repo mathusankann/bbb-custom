@@ -60,6 +60,9 @@ else
 fi
 
 # concatenate docker-compose file
+docker-compse docker-compse.traefik.yml
+
+
 PRE_FILE ="-f docker-compose.mariadb.yml"
 
 docker-compose $PRE_FILE $@
