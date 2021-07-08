@@ -1,20 +1,16 @@
 import { Meteor } from 'meteor/meteor';
 import UserSettings from '/imports/api/users-settings';
 import Logger from '/imports/startup/server/logger';
-import AuthTokenValidation, { ValidationStates } from '/imports/api/auth-token-validation';
+import { extractCredentials } from '/imports/api/common/server/helpers';
 import User from '/imports/api/users';
 
 function userSettings() {
-  const tokenValidation = AuthTokenValidation.findOne({ connectionId: this.connection.id });
-
-  if (!tokenValidation || tokenValidation.validationStatus !== ValidationStates.VALIDATED) {
-    Logger.warn(`Publishing UserSettings was requested by unauth connection ${this.connection.id}`);
+  if (!this.userId) {
     return UserSettings.find({ meetingId: '' });
   }
+  const { meetingId, requesterUserId } = extractCredentials(this.userId);
 
-  const { meetingId, userId } = tokenValidation;
-
-  const currentUser = User.findOne({ userId, meetingId });
+  const currentUser = User.findOne({ userId: requesterUserId });
 
   if (currentUser && currentUser.breakoutProps.isBreakoutUser) {
     const { parentId } = currentUser.breakoutProps;
@@ -26,7 +22,7 @@ function userSettings() {
     mainRoomUserSettings.map(({ setting, value }) => ({
       meetingId,
       setting,
-      userId,
+      userId: requesterUserId,
       value,
     })).forEach((doc) => {
       const selector = {
@@ -37,14 +33,14 @@ function userSettings() {
       UserSettings.upsert(selector, doc);
     });
 
-    Logger.debug('Publishing UserSettings', { meetingId, userId });
+    Logger.debug('Publishing user settings', { requesterUserId });
 
-    return UserSettings.find({ meetingId, userId });
+    return UserSettings.find({ meetingId, userId: requesterUserId });
   }
 
-  Logger.debug('Publishing UserSettings', { meetingId, userId });
+  Logger.debug('Publishing user settings', { requesterUserId });
 
-  return UserSettings.find({ meetingId, userId });
+  return UserSettings.find({ meetingId, userId: requesterUserId });
 }
 
 function publish(...args) {

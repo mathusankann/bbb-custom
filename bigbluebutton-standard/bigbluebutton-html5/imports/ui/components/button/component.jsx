@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
-import TooltipContainer from '/imports/ui/components/tooltip/container';
+import Tooltip from '/imports/ui/components/tooltip/component';
 import { styles } from './styles';
 import Icon from '../icon/component';
 import BaseButton from './base/component';
@@ -11,7 +11,7 @@ const SIZES = [
 ];
 
 const COLORS = [
-  'default', 'primary', 'danger', 'warning', 'success', 'dark', 'offline',
+  'default', 'primary', 'danger', 'success', 'dark',
 ];
 
 const propTypes = {
@@ -119,6 +119,7 @@ export default class Button extends BaseButton {
     delete remainingProps.circle;
     delete remainingProps.block;
     delete remainingProps.hideLabel;
+    delete remainingProps.tooltipDistance;
     delete remainingProps.tooltipLabel;
 
     return remainingProps;
@@ -131,6 +132,7 @@ export default class Button extends BaseButton {
       label,
       'aria-label': ariaLabel,
       'aria-expanded': ariaExpanded,
+      tooltipDistance,
       tooltipLabel,
     } = this.props;
 
@@ -139,11 +141,12 @@ export default class Button extends BaseButton {
     if ((hideLabel && !ariaExpanded) || tooltipLabel) {
       const buttonLabel = label || ariaLabel;
       return (
-        <TooltipContainer
+        <Tooltip
+          tooltipDistance={tooltipDistance}
           title={tooltipLabel || buttonLabel}
         >
           {this[renderFuncName]()}
-        </TooltipContainer>
+        </Tooltip>
       );
     }
 

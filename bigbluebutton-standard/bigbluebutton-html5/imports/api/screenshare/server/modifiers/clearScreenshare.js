@@ -7,8 +7,6 @@ export default function clearScreenshare(meetingId, screenshareConf) {
 
     if (meetingId && screenshareConf) {
       numberAffected = Screenshare.remove({ meetingId, 'screenshare.screenshareConf': screenshareConf });
-    } else if (meetingId) {
-      numberAffected = Screenshare.remove({ meetingId });
     } else {
       numberAffected = Screenshare.remove({});
     }

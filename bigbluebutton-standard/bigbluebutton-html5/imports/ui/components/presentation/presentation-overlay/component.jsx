@@ -4,7 +4,6 @@ import { throttle } from 'lodash';
 import SlideCalcUtil, {
   HUNDRED_PERCENT, MAX_PERCENT, STEP,
 } from '/imports/utils/slideCalcUtils';
-import {Meteor} from "meteor/meteor";
 // After lots of trial and error on why synching doesn't work properly, I found I had to
 // multiply the coordinates by 2. There's something I don't understand probably on the
 // canvas coordinate system. (ralam feb 22, 2012)
@@ -524,7 +523,7 @@ export default class PresentationOverlay extends Component {
     this.viewBoxX = viewBoxX;
     this.viewBoxY = viewBoxY;
 
-    const baseName = Meteor.settings.public.app.cdn + Meteor.settings.public.app.basename + Meteor.settings.public.app.instanceId;
+    const baseName = Meteor.settings.public.app.cdn + Meteor.settings.public.app.basename;
 
     let cursor;
     if (!userIsPresenter) {

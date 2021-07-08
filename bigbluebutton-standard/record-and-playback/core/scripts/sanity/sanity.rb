@@ -18,7 +18,8 @@
 # with BigBlueButton; if not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path('../../../lib/recordandplayback', __FILE__)
+
+require '../lib/recordandplayback'
 require 'logger'
 require 'trollop'
 require 'yaml'
@@ -26,7 +27,8 @@ require "nokogiri"
 require "redis"
 require "fileutils"
 
-props = BigBlueButton.read_props
+# This script lives in scripts/archive/steps while bigbluebutton.yml lives in scripts/
+props = YAML::load(File.open('bigbluebutton.yml'))
 log_dir = props['log_dir']
 audio_dir = props['raw_audio_src']
 recording_dir = props['recording_dir']

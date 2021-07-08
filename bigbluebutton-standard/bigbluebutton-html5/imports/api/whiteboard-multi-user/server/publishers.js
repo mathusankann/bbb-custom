@@ -1,19 +1,15 @@
 import WhiteboardMultiUser from '/imports/api/whiteboard-multi-user/';
 import { Meteor } from 'meteor/meteor';
 import Logger from '/imports/startup/server/logger';
-import AuthTokenValidation, { ValidationStates } from '/imports/api/auth-token-validation';
+import { extractCredentials } from '/imports/api/common/server/helpers';
 
 function whiteboardMultiUser() {
-  const tokenValidation = AuthTokenValidation.findOne({ connectionId: this.connection.id });
-
-  if (!tokenValidation || tokenValidation.validationStatus !== ValidationStates.VALIDATED) {
-    Logger.warn(`Publishing WhiteboardMultiUser was requested by unauth connection ${this.connection.id}`);
+  if (!this.userId) {
     return WhiteboardMultiUser.find({ meetingId: '' });
   }
+  const { meetingId, requesterUserId } = extractCredentials(this.userId);
 
-  const { meetingId, userId } = tokenValidation;
-
-  Logger.debug('Publishing WhiteboardMultiUser', { meetingId, userId });
+  Logger.debug('Publishing whiteboard-multi-user', { meetingId, requesterUserId });
 
   return WhiteboardMultiUser.find({ meetingId });
 }

@@ -18,7 +18,6 @@ const toggleBreakoutPanel = () => {
       ? 'userlist'
       : 'breakoutroom',
   );
-  window.dispatchEvent(new Event('panelChanged'));
 };
 
 const BreakoutRoomItem = ({
@@ -39,7 +38,6 @@ const BreakoutRoomItem = ({
               role="button"
               tabIndex={0}
               onClick={toggleBreakoutPanel}
-              data-test="breakoutRoomsItem"
               className={styles.listItem}
               aria-label={intl.formatMessage(intlMessages.breakoutTitle)}
             >

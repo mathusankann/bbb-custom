@@ -19,17 +19,18 @@ export default function handleGetVoiceUsers({ body }, meetingId) {
     intId: { $in: usersIds },
   }, { fields: { intId: 1 } }).fetch().map(m => m.intId);
 
+  const voiceUsersUpdated = [];
   users.forEach((user) => {
     if (voiceUsersIdsToUpdate.indexOf(user.intId) >= 0) {
       // user already exist, then update
-      updateVoiceUser(meetingId, {
+      voiceUsersUpdated.push(updateVoiceUser(meetingId, {
         intId: user.intId,
         voiceUserId: user.voiceUserId,
         talking: user.talking,
         muted: user.muted,
         voiceConf: meeting.voiceProp.voiceConf,
         joined: true,
-      });
+      }));
     } else {
       // user doesn't exist yet, then add it
       addVoiceUser(meetingId, {
@@ -57,4 +58,6 @@ export default function handleGetVoiceUsers({ body }, meetingId) {
     voiceUserId: user.voiceUserId,
     intId: user.intId,
   }));
+
+  return voiceUsersUpdated;
 }

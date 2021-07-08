@@ -9,4 +9,5 @@ if [ -f webapps/lti.war ]; then
   rm webapps/lti.war
 fi
 
-exec catalina.sh run
+catalina.sh run
+

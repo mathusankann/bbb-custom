@@ -17,7 +17,6 @@ class PresentationPodHdlrs(implicit val context: ActorContext)
   with PresentationConversionUpdatePubMsgHdlr
   with PresentationPageGeneratedPubMsgHdlr
   with PresentationPageCountErrorPubMsgHdlr
-  with PresentationUploadedFileTooLargeErrorPubMsgHdlr
   with PresentationUploadTokenReqMsgHdlr
   with ResizeAndMovePagePubMsgHdlr
   with SyncGetPresentationPodsMsgHdlr

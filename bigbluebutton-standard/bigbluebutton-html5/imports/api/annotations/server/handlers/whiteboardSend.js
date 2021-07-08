@@ -5,14 +5,12 @@ import Metrics from '/imports/startup/server/metrics';
 
 const { queueMetrics } = Meteor.settings.private.redis.metrics;
 
-const {
-  annotationsQueueProcessInterval: ANNOTATION_PROCESS_INTERVAL,
-} = Meteor.settings.public.whiteboard;
+const ANNOTATION_PROCCESS_INTERVAL = 60;
 
 let annotationsQueue = {};
 let annotationsRecieverIsRunning = false;
 
-const process = () => {
+const proccess = () => {
   if (!Object.keys(annotationsQueue).length) {
     annotationsRecieverIsRunning = false;
     return;
@@ -26,7 +24,7 @@ const process = () => {
   });
   annotationsQueue = {};
 
-  Meteor.setTimeout(process, ANNOTATION_PROCESS_INTERVAL);
+  Meteor.setTimeout(proccess, ANNOTATION_PROCCESS_INTERVAL);
 };
 
 export default function handleWhiteboardSend({ header, body }, meetingId) {
@@ -47,7 +45,7 @@ export default function handleWhiteboardSend({ header, body }, meetingId) {
   if (queueMetrics) {
     Metrics.setAnnotationQueueLength(meetingId, annotationsQueue[meetingId].length);
   }
-  if (!annotationsRecieverIsRunning) process();
+  if (!annotationsRecieverIsRunning) proccess();
 
   return addAnnotation(meetingId, whiteboardId, userId, annotation);
 }

@@ -1,19 +1,15 @@
 import { Meteor } from 'meteor/meteor';
 import Logger from '/imports/startup/server/logger';
 import Note from '/imports/api/note';
-import AuthTokenValidation, { ValidationStates } from '/imports/api/auth-token-validation';
+import { extractCredentials } from '/imports/api/common/server/helpers';
 
 function note() {
-  const tokenValidation = AuthTokenValidation.findOne({ connectionId: this.connection.id });
-
-  if (!tokenValidation || tokenValidation.validationStatus !== ValidationStates.VALIDATED) {
-    Logger.warn(`Publishing Note was requested by unauth connection ${this.connection.id}`);
+  if (!this.userId) {
     return Note.find({ meetingId: '' });
   }
+  const { meetingId, requesterUserId } = extractCredentials(this.userId);
 
-  const { meetingId, userId } = tokenValidation;
-
-  Logger.info(`Publishing Note for ${meetingId} ${userId}`);
+  Logger.info(`Publishing note for ${meetingId} ${requesterUserId}`);
 
   return Note.find({ meetingId });
 }

@@ -51,7 +51,6 @@ public class KeepAliveService implements MessageListener {
   private BlockingQueue<KeepAliveMessage> messages = new LinkedBlockingQueue<KeepAliveMessage>();
 
   private Long lastKeepAliveMessage = 0L;
-  private Long lastAkkaAppsTimestamp = 0L;
 
   private static final String SYSTEM = "BbbWeb";
 
@@ -124,7 +123,7 @@ public class KeepAliveService implements MessageListener {
   }
 
   private void processPing(KeepAlivePing msg) {
-    gw.sendKeepAlive(SYSTEM, System.currentTimeMillis(), lastAkkaAppsTimestamp);
+    gw.sendKeepAlive(SYSTEM, System.currentTimeMillis());
     Boolean akkaAppsIsAvailable = available;
 
     if (lastKeepAliveMessage != 0 && (System.currentTimeMillis() - lastKeepAliveMessage > 30000)) {
@@ -142,13 +141,12 @@ public class KeepAliveService implements MessageListener {
     }
 
     lastKeepAliveMessage = System.currentTimeMillis();
-    lastAkkaAppsTimestamp = msg.akkaAppsTimestamp;
     available = true;
   }
 
-  private void handleKeepAliveReply(String system, Long bbbWebTimestamp, Long akkaAppsTimestamp) {
+  private void handleKeepAliveReply(String system, Long timestamp) {
     if (SYSTEM.equals(system)) {
-      KeepAlivePong pong = new KeepAlivePong(system, bbbWebTimestamp, akkaAppsTimestamp);
+      KeepAlivePong pong = new KeepAlivePong(system, timestamp);
       queueMessage(pong);
     }
   }
@@ -157,7 +155,7 @@ public class KeepAliveService implements MessageListener {
   public void handle(IMessage message) {
     if (message instanceof KeepAliveReply) {
       KeepAliveReply msg = (KeepAliveReply) message;
-      handleKeepAliveReply(msg.system, msg.bbbWebTimestamp, msg.akkaAppsTimestamp);
+      handleKeepAliveReply(msg.system, msg.timestamp);
     }
   }
 }

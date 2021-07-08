@@ -1,49 +1,35 @@
-@import "/imports/ui/stylesheets/variables/breakpoints";
+@import "/imports/ui/stylesheets/variables/_all";
 @import "/imports/ui/components/actions-bar/styles.scss";
 
 .container {
   display: flex;
   flex-flow: row;
 
-  .muteToggle {
-    margin-right: var(--sm-padding-x);
-    margin-left: 0;
+  > * {
+    margin: 0 var(--sm-padding-x);
 
     @include mq($small-only) {
-      margin-right: var(--sm-padding-y);
-    }
-
-    [dir="rtl"] & {
-      margin-left: var(--sm-padding-x);
-      margin-right: 0;
-
-      @include mq($small-only) {
-        margin-left: var(--sm-padding-y);
-      }
+      margin: 0 var(--sm-padding-y);
     }
   }
-  
-  > :last-child {
-    margin-left: var(--sm-padding-x);
-    margin-right: 0;
 
-    @include mq($small-only) {
-      margin-left: var(--sm-padding-y);
+  > :first-child {
+    margin-left: 0;
+    margin-right: inherit;
+
+    [dir="rtl"] & {
+      margin-left: inherit;
+      margin-right: 0;
     }
+  }
+
+  > :last-child {
+      margin-left: inherit;
+      margin-right: 0;
 
     [dir="rtl"] & {
       margin-left: 0;
-      margin-right: var(--sm-padding-x);
-
-      @include mq($small-only) {
-        margin-right: var(--sm-padding-y);
-      }
-    }
-  }
-
-  .dropdownContent {
-    [dir="rtl"] & {
-      right: auto;
+      margin-right: inherit;
     }
   }
 }
@@ -73,26 +59,4 @@
   100% {
     box-shadow: 0 0 0 0 transparent;
   }
-}
-
-.dropdownListContainer {
-  width: max-content;
-
-  @include mq($small-only) {
-    width: 100%;
-  }
-}
-
-.stopButton {
-  & > span {
-    color: var(--color-danger);
-  }
-}
-
-.disableDeviceSelection {
-  pointer-events: none;
-}
-
-.selectedDevice {
-  font-weight: bold;
 }

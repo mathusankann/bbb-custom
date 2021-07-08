@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { defineMessages } from 'react-intl';
 import PropTypes from 'prop-types';
+import cx from 'classnames';
 import { styles } from '/imports/ui/components/user-list/user-list-content/styles';
 import _ from 'lodash';
 import { findDOMNode } from 'react-dom';
-import {
-  List,
-  AutoSizer,
-  CellMeasurer,
-  CellMeasurerCache,
-} from 'react-virtualized';
 import UserListItemContainer from './user-list-item/container';
 import UserOptionsContainer from './user-options/container';
-import Settings from '/imports/ui/services/settings';
 
 const propTypes = {
   compact: PropTypes.bool,
@@ -22,13 +17,21 @@ const propTypes = {
   currentUser: PropTypes.shape({}).isRequired,
   users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   setEmojiStatus: PropTypes.func.isRequired,
-  clearAllEmojiStatus: PropTypes.func.isRequired,
   roving: PropTypes.func.isRequired,
   requestUserInformation: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
   compact: false,
+};
+
+const listTransition = {
+  enter: styles.enter,
+  enterActive: styles.enterActive,
+  appear: styles.appear,
+  appearActive: styles.appearActive,
+  leave: styles.leave,
+  leaveActive: styles.leaveActive,
 };
 
 const intlMessages = defineMessages({
@@ -44,15 +47,8 @@ class UserParticipants extends Component {
   constructor() {
     super();
 
-    this.cache = new CellMeasurerCache({
-      fixedWidth: true,
-      keyMapper: () => 1,
-    });
-
     this.state = {
       selectedUser: null,
-      isOpen: false,
-      scrollArea: false,
     };
 
     this.userRefs = [];
@@ -60,7 +56,7 @@ class UserParticipants extends Component {
     this.getScrollContainerRef = this.getScrollContainerRef.bind(this);
     this.rove = this.rove.bind(this);
     this.changeState = this.changeState.bind(this);
-    this.rowRenderer = this.rowRenderer.bind(this);
+    this.getUsers = this.getUsers.bind(this);
     this.handleClickSelectedUser = this.handleClickSelectedUser.bind(this);
   }
 
@@ -88,11 +84,11 @@ class UserParticipants extends Component {
   componentDidUpdate(prevProps, prevState) {
     const { selectedUser } = this.state;
 
+    if (selectedUser === prevState.selectedUser) return;
+
     if (selectedUser) {
       const { firstChild } = selectedUser;
-      if (!firstChild.isEqualNode(document.activeElement)) {
-        firstChild.focus();
-      }
+      if (firstChild) firstChild.focus();
     }
   }
 
@@ -105,12 +101,7 @@ class UserParticipants extends Component {
     return this.refScrollContainer;
   }
 
-  rowRenderer({
-    index,
-    parent,
-    style,
-    key,
-  }) {
+  getUsers() {
     const {
       compact,
       setEmojiStatus,
@@ -119,23 +110,21 @@ class UserParticipants extends Component {
       currentUser,
       meetingIsBreakout,
     } = this.props;
-    const { scrollArea } = this.state;
-    const user = users[index];
-    const isRTL = Settings.application.isRTL;
 
-    return (
-      <CellMeasurer
-        key={key}
-        cache={this.cache}
-        columnIndex={0}
-        parent={parent}
-        rowIndex={index}
+    let index = -1;
+
+    return users.map(u => (
+      <CSSTransition
+        classNames={listTransition}
+        appear
+        enter
+        exit
+        timeout={0}
+        component="div"
+        className={cx(styles.participantsList)}
+        key={u.userId}
       >
-        <span
-          style={style}
-          key={key}
-          id={`user-${user.userId}`}
-        >
+        <div ref={(node) => { this.userRefs[index += 1] = node; }}>
           <UserListItemContainer
             {...{
               compact,
@@ -143,15 +132,13 @@ class UserParticipants extends Component {
               requestUserInformation,
               currentUser,
               meetingIsBreakout,
-              scrollArea,
-              isRTL,
             }}
-            user={user}
+            user={u}
             getScrollContainerRef={this.getScrollContainerRef}
           />
-        </span>
-      </CellMeasurer>
-    );
+        </div>
+      </CSSTransition>
+    ));
   }
 
   handleClickSelectedUser(event) {
@@ -164,9 +151,8 @@ class UserParticipants extends Component {
 
   rove(event) {
     const { roving } = this.props;
-    const { selectedUser, scrollArea } = this.state;
-    const usersItemsRef = findDOMNode(scrollArea.firstChild);
-
+    const { selectedUser } = this.state;
+    const usersItemsRef = findDOMNode(this.refScrollItems);
     roving(event, this.changeState, usersItemsRef, selectedUser);
   }
 
@@ -179,11 +165,10 @@ class UserParticipants extends Component {
       intl,
       users,
       compact,
-      clearAllEmojiStatus,
+      setEmojiStatus,
       currentUser,
       meetingIsBreakout,
     } = this.props;
-    const { isOpen, scrollArea } = this.state;
 
     return (
       <div className={styles.userListColumn}>
@@ -201,7 +186,7 @@ class UserParticipants extends Component {
                   ? (
                     <UserOptionsContainer {...{
                       users,
-                      clearAllEmojiStatus,
+                      setEmojiStatus,
                       meetingIsBreakout,
                     }}
                     />
@@ -213,40 +198,15 @@ class UserParticipants extends Component {
             : <hr className={styles.separator} />
         }
         <div
-          className={styles.virtulizedScrollableList}
+          className={styles.scrollableList}
           tabIndex={0}
-          ref={(ref) => {
-            this.refScrollContainer = ref;
-          }}
+          ref={(ref) => { this.refScrollContainer = ref; }}
         >
-          <span id="participants-destination" />
-          <AutoSizer>
-            {({ height, width }) => (
-              <List
-                {...{
-                  isOpen,
-                  users,
-                }}
-                ref={(ref) => {
-                  if (ref !== null) {
-                    this.listRef = ref;
-                  }
-
-                  if (ref !== null && !scrollArea) {
-                    this.setState({ scrollArea: findDOMNode(ref) });
-                  }
-                }}
-                rowHeight={this.cache.rowHeight}
-                rowRenderer={this.rowRenderer}
-                rowCount={users.length}
-                height={height - 1}
-                width={width - 1}
-                className={styles.scrollStyle}
-                overscanRowCount={30}
-                deferredMeasurementCache={this.cache}
-              />
-            )}
-          </AutoSizer>
+          <div className={styles.list}>
+            <TransitionGroup ref={(ref) => { this.refScrollItems = ref; }}>
+              {this.getUsers()}
+            </TransitionGroup>
+          </div>
         </div>
       </div>
     );

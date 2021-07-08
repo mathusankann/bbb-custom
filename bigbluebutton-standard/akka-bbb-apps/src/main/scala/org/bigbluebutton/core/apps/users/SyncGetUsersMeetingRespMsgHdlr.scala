@@ -11,7 +11,9 @@ trait SyncGetUsersMeetingRespMsgHdlr {
   val outGW: OutMsgRouter
 
   def handleSyncGetUsersMeetingRespMsg(): Unit = {
-    val routing = Routing.addMsgToHtml5InstanceIdRouting(liveMeeting.props.meetingProp.intId, liveMeeting.props.systemProps.html5InstanceId.toString)
+    log.debug("Handling SyncGetUsersMeetingRespMsg")
+
+    val routing = Routing.addMsgToClientRouting(MessageTypes.DIRECT, liveMeeting.props.meetingProp.intId, "nodeJSapp")
     val envelope = BbbCoreEnvelope(SyncGetUsersMeetingRespMsg.NAME, routing)
     val header = BbbClientMsgHeader(SyncGetUsersMeetingRespMsg.NAME, liveMeeting.props.meetingProp.intId, "nodeJSapp")
 

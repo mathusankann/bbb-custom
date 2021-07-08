@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 import { HEXToINTColor, INTToHEXColor } from '/imports/utils/hexInt';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, intlShape } from 'react-intl';
+import browser from 'browser-detect';
+import { noop } from 'lodash';
 import KEY_CODES from '/imports/utils/keyCodes';
 import injectWbResizeEvent from '/imports/ui/components/presentation/resize-wrapper/component';
 import { styles } from './styles.scss';
@@ -52,14 +54,6 @@ const intlMessages = defineMessages({
     id: 'app.whiteboard.toolbar.multiUserOff',
     description: 'Whiteboard toolbar turn multi-user off menu',
   },
-  toolbarPalmRejectionOn: {
-    id: 'app.whiteboard.toolbar.palmRejectionOn',
-    description: 'Whiteboard toolbar turn palm rejection on menu',
-  },
-  toolbarPalmRejectionOff: {
-    id: 'app.whiteboard.toolbar.palmRejectionOff',
-    description: 'Whiteboard toolbar turn palm rejection off menu',
-  },
   toolbarFontSize: {
     id: 'app.whiteboard.toolbar.fontSize',
     description: 'Whiteboard toolbar font size menu',
@@ -70,15 +64,14 @@ const intlMessages = defineMessages({
   },
 });
 
+const isEdge = browser().name === 'edge';
+const runExceptInEdge = fn => (isEdge ? noop : fn);
+
 class WhiteboardToolbar extends Component {
   constructor(props) {
     super(props);
 
-    const {
-      annotations,
-      multiUser,
-      isPresenter,
-    } = this.props;
+    const { annotations, multiUser, isPresenter } = this.props;
 
     let annotationSelected = {
       icon: 'hand',
@@ -118,8 +111,6 @@ class WhiteboardToolbar extends Component {
       onBlurEnabled: true,
 
       panMode: false,
-
-      palmRejection: false,
     };
 
     this.displaySubMenu = this.displaySubMenu.bind(this);
@@ -128,28 +119,23 @@ class WhiteboardToolbar extends Component {
     this.handleUndo = this.handleUndo.bind(this);
     this.handleClearAll = this.handleClearAll.bind(this);
     this.handleSwitchWhiteboardMode = this.handleSwitchWhiteboardMode.bind(this);
-    this.handleSwitchPalmRejectionMode = this.handleSwitchPalmRejectionMode.bind(this);
     this.handleAnnotationChange = this.handleAnnotationChange.bind(this);
     this.handleThicknessChange = this.handleThicknessChange.bind(this);
     this.handleFontSizeChange = this.handleFontSizeChange.bind(this);
     this.handleColorChange = this.handleColorChange.bind(this);
     this.handleMouseEnter = this.handleMouseEnter.bind(this);
     this.handleMouseLeave = this.handleMouseLeave.bind(this);
+    this.componentDidMount = runExceptInEdge(this.componentDidMount);
+    this.componentDidUpdate = runExceptInEdge(this.componentDidUpdate);
     this.panOn = this.panOn.bind(this);
     this.panOff = this.panOff.bind(this);
   }
 
   componentDidMount() {
-    const {
-      actions,
-      multiUser,
-      isPresenter,
-    } = this.props;
-
+    const { actions, multiUser, isPresenter } = this.props;
     const drawSettings = actions.getCurrentDrawSettings();
-    const palmRejectionMode = actions.getCurrentPalmRejectionMode();
     const {
-      annotationSelected, thicknessSelected, colorSelected, fontSizeSelected, palmRejection,
+      annotationSelected, thicknessSelected, colorSelected, fontSizeSelected,
     } = this.state;
 
     document.addEventListener('keydown', this.panOn);
@@ -177,14 +163,6 @@ class WhiteboardToolbar extends Component {
           textShapeActiveId: '',
         },
       );
-    }
-
-    if (palmRejectionMode) {
-      this.setState({
-        palmRejection: palmRejectionMode,
-      });
-    } else {
-      actions.setInitialPalmRejectionMode(palmRejection);
     }
 
     if (annotationSelected.value !== 'text') {
@@ -305,7 +283,7 @@ class WhiteboardToolbar extends Component {
      * 4. Trigger initial animation for the icons
     */
     // 1st case
-    if ((this.thicknessListIconRadius && this.thicknessListIconColor) || annotationSelected.value === 'text') {
+    if (this.thicknessListIconRadius && this.thicknessListIconColor) {
       if (colorSelected.value !== prevState.colorSelected.value) {
         // 1st case b)
         if (annotationSelected.value !== 'text') {
@@ -314,7 +292,7 @@ class WhiteboardToolbar extends Component {
         // 1st case a)
         this.colorListIconColor.beginElement();
         // 2nd case
-      } else if (thicknessSelected.value !== prevState.thicknessSelected.value && annotationSelected.value !== 'text') {
+      } else if (thicknessSelected.value !== prevState.thicknessSelected.value) {
         this.thicknessListIconRadius.beginElement();
         // 3rd case
       } else if (annotationSelected.value !== 'text'
@@ -384,27 +362,7 @@ class WhiteboardToolbar extends Component {
       actions,
     } = this.props;
 
-    if (multiUser) {
-      actions.removeWhiteboardGlobalAccess(whiteboardId);
-    } else {
-      actions.addWhiteboardGlobalAccess(whiteboardId);
-    }
-  }
-
-  handleSwitchPalmRejectionMode() {
-    const {
-      actions,
-    } = this.props;
-
-    const {
-      palmRejection,
-    } = this.state;
-
-    actions.setPalmRejectionMode(!palmRejection);
-
-    this.setState({
-      palmRejection: !palmRejection,
-    });
+    actions.changeWhiteboardMode(!multiUser, whiteboardId);
   }
 
   // changes a current selected annotation both in the state and in the session
@@ -572,7 +530,7 @@ class WhiteboardToolbar extends Component {
       <p
         className={styles.textThickness}
         style={{
-          fontSize: fontSizeSelected.value <= 32 ? fontSizeSelected.value : 32,
+          fontSize: fontSizeSelected.value,
           color: colorSelected.value,
           WebkitTransition: `color ${TRANSITION_DURATION}, font-size ${TRANSITION_DURATION}`, /* Safari */
           transition: `color ${TRANSITION_DURATION}, font-size ${TRANSITION_DURATION}`,
@@ -639,36 +597,49 @@ class WhiteboardToolbar extends Component {
 
     return (
       <svg className={styles.customSvgIcon} shapeRendering="geometricPrecision">
-        <circle
-          shapeRendering="geometricPrecision"
-          cx="50%"
-          cy="50%"
-          stroke="black"
-          strokeWidth="1"
-        >
-          <animate
-            ref={(ref) => { this.thicknessListIconColor = ref; }}
-            attributeName="fill"
-            attributeType="XML"
-            from={prevColorSelected.value}
-            to={colorSelected.value}
-            begin="indefinite"
-            dur={TRANSITION_DURATION}
-            repeatCount="1"
-            fill="freeze"
-          />
-          <animate
-            ref={(ref) => { this.thicknessListIconRadius = ref; }}
-            attributeName="r"
-            attributeType="XML"
-            from={prevThicknessSelected.value}
-            to={thicknessSelected.value}
-            begin="indefinite"
-            dur={TRANSITION_DURATION}
-            repeatCount="1"
-            fill="freeze"
-          />
-        </circle>
+        {isEdge
+          ? (
+            <circle
+              cx="50%"
+              cy="50%"
+              r={thicknessSelected.value}
+              stroke="black"
+              strokeWidth="1"
+              fill={colorSelected.value}
+            />
+          )
+          : (
+            <circle
+              shapeRendering="geometricPrecision"
+              cx="50%"
+              cy="50%"
+              stroke="black"
+              strokeWidth="1"
+            >
+              <animate
+                ref={(ref) => { this.thicknessListIconColor = ref; }}
+                attributeName="fill"
+                attributeType="XML"
+                from={prevColorSelected.value}
+                to={colorSelected.value}
+                begin="indefinite"
+                dur={TRANSITION_DURATION}
+                repeatCount="1"
+                fill="freeze"
+              />
+              <animate
+                ref={(ref) => { this.thicknessListIconRadius = ref; }}
+                attributeName="r"
+                attributeType="XML"
+                from={prevThicknessSelected.value}
+                to={thicknessSelected.value}
+                begin="indefinite"
+                dur={TRANSITION_DURATION}
+                repeatCount="1"
+                fill="freeze"
+              />
+            </circle>
+          )}
       </svg>
     );
   }
@@ -727,19 +698,33 @@ class WhiteboardToolbar extends Component {
 
     return (
       <svg className={styles.customSvgIcon}>
-        <rect x="25%" y="25%" width="50%" height="50%" stroke="black" strokeWidth="1">
-          <animate
-            ref={(ref) => { this.colorListIconColor = ref; }}
-            attributeName="fill"
-            attributeType="XML"
-            from={prevColorSelected.value}
-            to={colorSelected.value}
-            begin="indefinite"
-            dur={TRANSITION_DURATION}
-            repeatCount="1"
-            fill="freeze"
-          />
-        </rect>
+        {isEdge
+          ? (
+            <rect
+              x="25%"
+              y="25%"
+              width="50%"
+              height="50%"
+              stroke="black"
+              strokeWidth="1"
+              fill={colorSelected.value}
+            />
+          ) : (
+            <rect x="25%" y="25%" width="50%" height="50%" stroke="black" strokeWidth="1">
+              <animate
+                ref={(ref) => { this.colorListIconColor = ref; }}
+                attributeName="fill"
+                attributeType="XML"
+                from={prevColorSelected.value}
+                to={colorSelected.value}
+                begin="indefinite"
+                dur={TRANSITION_DURATION}
+                repeatCount="1"
+                fill="freeze"
+              />
+            </rect>
+          )
+        }
       </svg>
     );
   }
@@ -773,44 +758,17 @@ class WhiteboardToolbar extends Component {
   }
 
   renderMultiUserItem() {
-    const {
-      intl,
-      isMeteorConnected,
-      multiUser,
-      multiUserSize,
-    } = this.props;
-
-    return (
-      <span className={styles.multiUserToolItem} data-test={multiUser ? 'multiWhiteboardTool' : 'whiteboardTool'}>
-        {multiUser && <span className={styles.multiUserTool}>{multiUserSize}</span>}
-        <ToolbarMenuItem
-          disabled={!isMeteorConnected}
-          label={multiUser
-            ? intl.formatMessage(intlMessages.toolbarMultiUserOff)
-            : intl.formatMessage(intlMessages.toolbarMultiUserOn)
-          }
-          icon={multiUser ? 'multi_whiteboard' : 'whiteboard'}
-          onItemClick={this.handleSwitchWhiteboardMode}
-          className={styles.toolbarButton}
-        />
-      </span>
-    );
-  }
-
-  renderPalmRejectionItem() {
-    const { intl, isMeteorConnected } = this.props;
-
-    const { palmRejection } = this.state;
+    const { intl, multiUser, isMeteorConnected } = this.props;
 
     return (
       <ToolbarMenuItem
         disabled={!isMeteorConnected}
-        label={palmRejection
-          ? intl.formatMessage(intlMessages.toolbarPalmRejectionOff)
-          : intl.formatMessage(intlMessages.toolbarPalmRejectionOn)
+        label={multiUser
+          ? intl.formatMessage(intlMessages.toolbarMultiUserOff)
+          : intl.formatMessage(intlMessages.toolbarMultiUserOn)
         }
-        icon={palmRejection ? 'palm_rejection' : 'no_palm_rejection'}
-        onItemClick={this.handleSwitchPalmRejectionMode}
+        icon={multiUser ? 'multi_whiteboard' : 'whiteboard'}
+        onItemClick={this.handleSwitchWhiteboardMode}
         className={styles.toolbarButton}
       />
     );
@@ -827,7 +785,6 @@ class WhiteboardToolbar extends Component {
           {this.renderColorItem()}
           {this.renderUndoItem()}
           {this.renderClearAllItem()}
-          {window.PointerEvent ? this.renderPalmRejectionItem() : null}
           {isPresenter ? this.renderMultiUserItem() : null}
         </div>
       </div>
@@ -839,15 +796,12 @@ WhiteboardToolbar.defaultProps = {
   colors: ANNOTATION_COLORS,
   thicknessRadiuses: THICKNESS_RADIUSES,
   fontSizes: FONT_SIZES,
-  intl: {},
+  intl: intlShape,
 };
 
 WhiteboardToolbar.propTypes = {
   // defines a current mode of the whiteboard, multi/single user
   multiUser: PropTypes.bool.isRequired,
-
-  // defines the number of non-presenters that have access to the whiteboard
-  multiUserSize: PropTypes.number.isRequired,
 
   // defines whether a current user is a presenter or not
   isPresenter: PropTypes.bool.isRequired,
@@ -879,7 +833,7 @@ WhiteboardToolbar.propTypes = {
     value: PropTypes.number.isRequired,
   }).isRequired),
 
-  intl: PropTypes.object.isRequired,
+  intl: intlShape,
 
 };
 

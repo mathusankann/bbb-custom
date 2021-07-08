@@ -18,12 +18,14 @@
 
 package org.bigbluebutton.presentation.imp;
 
-import org.bigbluebutton.api.messaging.messages.PresentationUploadToken;
 import org.bigbluebutton.api2.IBbbWebApiGWApp;
 import org.bigbluebutton.presentation.ConversionMessageConstants;
 import org.bigbluebutton.presentation.GeneratedSlidesInfoHelper;
 import org.bigbluebutton.presentation.UploadedPresentation;
-import org.bigbluebutton.presentation.messages.*;
+import org.bigbluebutton.presentation.messages.DocPageCompletedProgress;
+import org.bigbluebutton.presentation.messages.DocPageGeneratedProgress;
+import org.bigbluebutton.presentation.messages.IDocConversionMsg;
+import org.bigbluebutton.presentation.messages.OfficeDocConversionProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,17 +41,6 @@ public class SwfSlidesGenerationProgressNotifier {
     messagingService.sendDocConversionMsg(msg);
   }
 
-  public void sendUploadFileTooLargeMessage(PresentationUploadToken pres, int uploadedFileSize, int maxUploadFileSize) {
-    UploadFileTooLargeMessage progress = new UploadFileTooLargeMessage(
-            pres.podId,
-            pres.meetingId,
-            pres.filename,
-            pres.authzToken,
-            ConversionMessageConstants.FILE_TOO_LARGE,
-            uploadedFileSize,
-            maxUploadFileSize);
-    messagingService.sendDocConversionMsg(progress);
-  }
 
   public void sendConversionUpdateMessage(int slidesCompleted, UploadedPresentation pres, int pageGenerated) {
     DocPageGeneratedProgress progress = new DocPageGeneratedProgress(pres.getPodId(),

@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, intlShape } from 'react-intl';
 import Button from '/imports/ui/components/button/component';
 import MediaService from '/imports/ui/components/media/service';
+import { styles } from '../styles';
 
 const propTypes = {
-  intl: PropTypes.object.isRequired,
+  intl: intlShape.isRequired,
   toggleSwapLayout: PropTypes.func.isRequired,
 };
 
@@ -26,8 +27,8 @@ const PresentationOptionsContainer = ({ intl, toggleSwapLayout, isThereCurrentPr
   if (shouldUnswapLayout()) toggleSwapLayout();
   return (
     <Button
+      className={styles.button}
       icon="presentation"
-      data-test="restorePresentationButton"
       label={intl.formatMessage(intlMessages.restorePresentationLabel)}
       description={intl.formatMessage(intlMessages.restorePresentationDesc)}
       color="primary"

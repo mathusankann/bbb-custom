@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getFormattedColor, getStrokeWidth, denormalizeCoord } from '../helpers';
+import AnnotationHelpers from '../helpers';
 
 export default class RectangleDrawComponent extends Component {
+
   shouldComponentUpdate(nextProps) {
-    const { version } = this.props;
-    return version !== nextProps.version;
+    return this.props.version !== nextProps.version;
   }
 
   getCoordinates() {
-    const { slideWidth, slideHeight, annotation } = this.props;
-    const { points } = annotation;
-    /* eslint-disable prefer-destructuring */
+    const { points } = this.props.annotation;
+    const { slideWidth, slideHeight } = this.props;
     // x1 and y1 are the coordinates of the top left corner of the annotation
     // x2 and y2 are the coordinates of the bottom right corner of the annotation
     let x1 = points[0];
@@ -30,11 +29,11 @@ export default class RectangleDrawComponent extends Component {
       y1 = points[3];
       y2 = points[1];
     }
-    /* eslint-enable prefer-destructuring */
-    const x = denormalizeCoord(x1, slideWidth);
-    const y = denormalizeCoord(y1, slideHeight);
-    const width = denormalizeCoord((x2 - x1), slideWidth);
-    const height = denormalizeCoord((y2 - y1), slideHeight);
+
+    const x = (x1 / 100) * slideWidth;
+    const y = (y1 / 100) * slideHeight;
+    const width = ((x2 - x1) / 100) * slideWidth;
+    const height = ((y2 - y1) / 100) * slideHeight;
 
     return {
       x,
@@ -55,10 +54,9 @@ export default class RectangleDrawComponent extends Component {
         width={results.width}
         height={results.height}
         fill="none"
-        stroke={getFormattedColor(annotation.color)}
-        strokeWidth={getStrokeWidth(annotation.thickness, slideWidth)}
+        stroke={AnnotationHelpers.getFormattedColor(annotation.color)}
+        strokeWidth={AnnotationHelpers.getStrokeWidth(annotation.thickness, slideWidth)}
         style={{ WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)' }}
-        data-test="drawnRectangle"
       />
     );
   }

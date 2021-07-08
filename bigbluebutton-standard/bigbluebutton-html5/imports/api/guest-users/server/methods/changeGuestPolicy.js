@@ -9,22 +9,16 @@ const CHANNEL = REDIS_CONFIG.channels.toAkkaApps;
 const EVENT_NAME = 'SetGuestPolicyCmdMsg';
 
 export default function changeGuestPolicy(policyRule) {
-  try {
-    const { meetingId, requesterUserId } = extractCredentials(this.userId);
+  const { meetingId, requesterUserId } = extractCredentials(this.userId);
 
-    check(meetingId, String);
-    check(requesterUserId, String);
-    check(policyRule, String);
+  check(policyRule, String);
 
-    const payload = {
-      setBy: requesterUserId,
-      policy: policyRule,
-    };
+  const payload = {
+    setBy: requesterUserId,
+    policy: policyRule,
+  };
 
-    Logger.info(`User=${requesterUserId} change guest policy to ${policyRule}`);
+  Logger.info(`User=${requesterUserId} change guest policy to ${policyRule}`);
 
-    RedisPubSub.publishUserMessage(CHANNEL, EVENT_NAME, meetingId, requesterUserId, payload);
-  } catch (err) {
-    Logger.error(`Exception while invoking method changeGuestPolicy ${err.stack}`);
-  }
+  return RedisPubSub.publishUserMessage(CHANNEL, EVENT_NAME, meetingId, requesterUserId, payload);
 }

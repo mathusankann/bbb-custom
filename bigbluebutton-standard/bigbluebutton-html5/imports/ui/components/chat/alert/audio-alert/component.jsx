@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import AudioService from '/imports/ui/components/audio/service';
-import {Meteor} from "meteor/meteor";
 
 const propTypes = {
   play: PropTypes.bool.isRequired,
@@ -30,8 +29,7 @@ class ChatAudioAlert extends Component {
     const { play } = this.props;
     if (!play) return;
     AudioService.playAlertSound(`${Meteor.settings.public.app.cdn
-      + Meteor.settings.public.app.basename
-      + Meteor.settings.public.app.instanceId}`
+      + Meteor.settings.public.app.basename}`
       + '/resources/sounds/notify.mp3');
   }
 

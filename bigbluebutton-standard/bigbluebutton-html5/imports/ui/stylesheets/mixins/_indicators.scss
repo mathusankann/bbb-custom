@@ -1,3 +1,6 @@
+@import "/imports/ui/stylesheets/variables/palette";
+@import "/imports/ui/stylesheets/variables/general";
+
 @mixin presenterIndicator() {
   &:before {
     opacity: 1;
@@ -16,9 +19,20 @@
   }
 
   :global(.browser-chrome) &:before,
-  :global(.browser-firefox) &:before,
+  :global(.browser-firefox) &:before {
+    padding: .45rem;
+  }
+
   :global(.browser-edge) &:before {
-      padding: var(--indicator-padding);
+    padding-top: var(--indicator-padding-top);
+    padding-left: var(--indicator-padding-left);
+    padding-right: var(--indicator-padding-right);
+    padding-bottom: var(--indicator-padding-bottom);
+
+    [dir="rtl"] & {
+      padding-right: var(--indicator-padding-left);
+      padding-left: var(--indicator-padding-right);
+    }
   }
 }
 
@@ -27,6 +41,13 @@
     opacity: 1;
     width: 1.2rem;
     height: 1.2rem;
+  }
+
+  :global(.browser-edge) &:after {
+    padding-top: var(--indicator-padding-top);
+    padding-left: var(--indicator-padding-left);
+    padding-right: var(--indicator-padding-right);
+    padding-bottom: var(--indicator-padding-bottom);
   }
 }
 

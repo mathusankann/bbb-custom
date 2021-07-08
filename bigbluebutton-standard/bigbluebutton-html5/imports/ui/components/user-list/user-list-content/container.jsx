@@ -1,30 +1,25 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { withTracker } from 'meteor/react-meteor-data';
 import { Session } from 'meteor/session';
 import Auth from '/imports/ui/services/auth';
-import Storage from '/imports/ui/services/storage/session';
 import UserContent from './component';
 import GuestUsers from '/imports/api/guest-users/';
-import { UsersContext } from '/imports/ui/components/components-data/users-context/context';
+import Users from '/imports/api/users';
 
-const CLOSED_CHAT_LIST_KEY = 'closedChatList';
-
-const UserContentContainer = (props) => {
-  const usingUsersContext = useContext(UsersContext);
-  const { users } = usingUsersContext;
-  const currentUser = {
-    userId: Auth.userID,
-    presenter: users[Auth.meetingID][Auth.userID].presenter,
-    locked: users[Auth.meetingID][Auth.userID].locked,
-    role: users[Auth.meetingID][Auth.userID].role,
-  };
-  return (<UserContent {...props} currentUser={currentUser} />);
-};
+const UserContentContainer = props => <UserContent {...props} />;
 
 export default withTracker(() => ({
   pollIsOpen: Session.equals('isPollOpen', true),
   forcePollOpen: Session.equals('forcePollOpen', true),
-  currentClosedChats: Storage.getItem(CLOSED_CHAT_LIST_KEY) || [],
+  currentUser: Users.findOne({ userId: Auth.userID }, {
+    fields: {
+      userId: 1,
+      role: 1,
+      guest: 1,
+      locked: 1,
+      presenter: 1,
+    },
+  }),
   pendingUsers: GuestUsers.find({
     meetingId: Auth.meetingID,
     approved: false,

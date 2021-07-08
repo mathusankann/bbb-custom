@@ -15,7 +15,7 @@ export default function startTyping(meetingId, userId, chatId) {
     userId,
   };
 
-  const user = Users.findOne(selector, { fields: { name: 1, role: 1 } });
+  const user = Users.findOne(selector);
 
   const modifier = {
     meetingId,

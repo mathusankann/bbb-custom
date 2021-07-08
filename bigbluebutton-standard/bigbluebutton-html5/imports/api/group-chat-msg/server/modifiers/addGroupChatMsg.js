@@ -1,3 +1,4 @@
+import flat from 'flat';
 import { Match, check } from 'meteor/check';
 import Logger from '/imports/startup/server/logger';
 import { GroupChatMsg } from '/imports/api/group-chat-msg';
@@ -28,22 +29,18 @@ export default function addGroupChatMsg(meetingId, chatId, msg) {
     correlationId: Match.Maybe(String),
   });
 
-  const {
-    color,
-    sender,
-    ...restMsg
-  } = msg;
-
   const msgDocument = {
-    ...restMsg,
-    sender: sender.id,
+    ...msg,
     meetingId,
     chatId,
     message: parseMessage(msg.message),
+    sender: msg.sender.id,
   };
 
+  const modifier = flat(msgDocument, { safe: true });
+
   try {
-    const insertedId = GroupChatMsg.insert(msgDocument);
+    const insertedId = GroupChatMsg.insert(modifier);
 
     if (insertedId) {
       Logger.info(`Added group-chat-msg msgId=${msg.id} chatId=${chatId} meetingId=${meetingId}`);

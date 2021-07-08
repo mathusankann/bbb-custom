@@ -1,3 +1,6 @@
+@import "/imports/ui/stylesheets/mixins/focus";
+@import "/imports/ui/stylesheets/variables/_all";
+
 .videoPlayer iframe {
   display: flex;
   flex-flow: column;
@@ -21,4 +24,5 @@
   vertical-align: middle;
   text-align: center;
   pointer-events: none;
+
 }

@@ -6,7 +6,7 @@ const currentModal = {
   tracker: new Tracker.Dependency(),
 };
 
-export const showModal = (component) => {
+const showModal = (component) => {
   if (currentModal.component !== component) {
     currentModal.component = component;
     currentModal.tracker.changed();

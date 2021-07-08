@@ -1,3 +1,5 @@
+@import "/imports/ui/stylesheets/variables/_all";
+
 :root {
   --audioDial-font-size: 2rem;
  }
@@ -14,7 +16,6 @@
 
 .dialText, .telvoice {
   font-size: var(--audioDial-font-size);
-  direction: ltr;
 }
 
 .conferenceText {

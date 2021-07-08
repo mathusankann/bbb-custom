@@ -11,7 +11,6 @@ import Rating from './rating/component';
 import { styles } from './styles';
 import logger from '/imports/startup/client/logger';
 import Users from '/imports/api/users';
-import Meetings from '/imports/api/meetings';
 import AudioManager from '/imports/ui/services/audio-manager';
 import { meetingIsBreakout } from '/imports/ui/components/app/service';
 
@@ -35,10 +34,6 @@ const intlMessage = defineMessages({
   messageEnded: {
     id: 'app.meeting.endedMessage',
     description: 'message saying to go back to home screen',
-  },
-  messageEndedByUser: {
-    id: 'app.meeting.endedByUserMessage',
-    description: 'message informing who ended the meeting',
   },
   buttonOkay: {
     id: 'app.meeting.endNotification.ok.label',
@@ -95,11 +90,6 @@ const propTypes = {
     formatMessage: PropTypes.func.isRequired,
   }).isRequired,
   code: PropTypes.string.isRequired,
-  reason: PropTypes.string,
-};
-
-const defaultProps = {
-  reason: null,
 };
 
 class MeetingEnded extends PureComponent {
@@ -119,17 +109,6 @@ class MeetingEnded extends PureComponent {
     const user = Users.findOne({ userId: Auth.userID });
     if (user) {
       this.localUserRole = user.role;
-    }
-
-    const meeting = Meetings.findOne({ id: user.meetingID });
-    if (meeting) {
-      const endedBy = Users.findOne({
-        userId: meeting.meetingEndedBy,
-      }, { fields: { name: 1 } });
-
-      if (endedBy) {
-        this.meetingEndedBy = endedBy.name;
-      }
     }
 
     this.setSelectedStar = this.setSelectedStar.bind(this);
@@ -179,7 +158,7 @@ class MeetingEnded extends PureComponent {
       comment: MeetingEnded.getComment(),
       userRole: this.localUserRole,
     };
-    const url = './feedback';
+    const url = '/html5client/feedback';
     const options = {
       method: 'POST',
       body: JSON.stringify(message),
@@ -210,10 +189,9 @@ class MeetingEnded extends PureComponent {
   }
 
   renderNoFeedback() {
-    const { intl, code, reason } = this.props;
+    const { intl, code } = this.props;
 
-    const logMessage = reason === 'user_requested_eject_reason' ? 'User removed from the meeting' : 'Meeting ended component, no feedback configured';
-    logger.info({ logCode: 'meeting_ended_code', extraInfo: { endedCode: code, reason } }, logMessage);
+    logger.info({ logCode: 'meeting_ended_code', extraInfo: { endedCode: code } }, 'Meeting ended component, no feedback configured');
 
     return (
       <div className={styles.parent}>
@@ -226,11 +204,6 @@ class MeetingEnded extends PureComponent {
             </h1>
             {!allowRedirectToLogoutURL() ? null : (
               <div>
-                {this.meetingEndedBy ? (
-                  <div className={styles.text}>
-                    {intl.formatMessage(intlMessage.messageEndedByUser, { 0: this.meetingEndedBy })}
-                  </div>
-                ) : null}
                 <div className={styles.text}>
                   {intl.formatMessage(intlMessage.messageEnded)}
                 </div>
@@ -252,7 +225,7 @@ class MeetingEnded extends PureComponent {
   }
 
   renderFeedback() {
-    const { intl, code, reason } = this.props;
+    const { intl, code } = this.props;
     const {
       selected,
       dispatched,
@@ -260,16 +233,15 @@ class MeetingEnded extends PureComponent {
 
     const noRating = selected <= 0;
 
-    const logMessage = reason === 'user_requested_eject_reason' ? 'User removed from the meeting' : 'Meeting ended component, feedback allowed';
-    logger.info({ logCode: 'meeting_ended_code', extraInfo: { endedCode: code, reason } }, logMessage);
+    logger.info({ logCode: 'meeting_ended_code', extraInfo: { endedCode: code } }, 'Meeting ended component, feedback allowed');
 
     return (
       <div className={styles.parent}>
-        <div className={styles.modal} data-test="meetingEndedModal">
+        <div className={styles.modal}>
           <div className={styles.content}>
-            <h1 className={styles.title}>
+            <h1 className={styles.title} data-test="meetingEndedModalTitle">
               {
-                intl.formatMessage(intlMessage[reason] || intlMessage[430])
+                intl.formatMessage(intlMessage[code] || intlMessage[430])
               }
             </h1>
             <div className={styles.text}>
@@ -279,7 +251,7 @@ class MeetingEnded extends PureComponent {
             </div>
 
             {this.shouldShowFeedback() ? (
-              <div data-test="rating">
+              <div>
                 <Rating
                   total="5"
                   onRate={this.setSelectedStar}
@@ -327,6 +299,5 @@ class MeetingEnded extends PureComponent {
 }
 
 MeetingEnded.propTypes = propTypes;
-MeetingEnded.defaultProps = defaultProps;
 
 export default injectIntl(MeetingEnded);

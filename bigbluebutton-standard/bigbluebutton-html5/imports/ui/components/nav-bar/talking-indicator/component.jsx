@@ -18,10 +18,6 @@ const intlMessages = defineMessages({
     id: 'app.talkingIndicator.ariaMuteDesc',
     description: 'aria description for muting a user',
   },
-  muteLabel: {
-    id: 'app.actionsBar.muteLabel',
-    description: 'indicator mute label for moderators',
-  },
 });
 
 class TalkingIndicator extends PureComponent {
@@ -33,9 +29,7 @@ class TalkingIndicator extends PureComponent {
   }
 
   render() {
-    const {
-      intl, talkers, openPanel, amIModerator,
-    } = this.props;
+    const { intl, talkers, openPanel } = this.props;
     if (!talkers) return null;
 
     const talkingUserElements = Object.keys(talkers).map((id) => {
@@ -52,7 +46,6 @@ class TalkingIndicator extends PureComponent {
         [styles.spoke]: !talking,
         [styles.muted]: muted,
         [styles.mobileHide]: openPanel !== '',
-        [styles.isViewer]: !amIModerator,
       };
 
       const ariaLabel = intl.formatMessage(talking
@@ -69,11 +62,6 @@ class TalkingIndicator extends PureComponent {
           className={cx(style)}
           onClick={() => this.handleMuteUser(voiceUserId)}
           label={callerName}
-          tooltipLabel={!muted && amIModerator
-            ? `${intl.formatMessage(intlMessages.muteLabel)} ${callerName}`
-            : null
-          }
-          data-test={talking ? 'isTalking' : 'wasTalking'}
           aria-label={ariaLabel}
           aria-describedby={talking ? 'description' : null}
           color="primary"

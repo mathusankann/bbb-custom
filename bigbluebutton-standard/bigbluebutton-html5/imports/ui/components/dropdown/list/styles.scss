@@ -1,6 +1,5 @@
-@import "/imports/ui/stylesheets/variables/breakpoints";
+@import "/imports/ui/stylesheets/variables/_all";
 @import '/imports/ui/stylesheets/mixins/_indicators';
-@import "/imports/ui/stylesheets/variables/placeholders";
 
 %list {
   list-style: none;
@@ -26,7 +25,6 @@
 .verticalList {
   @extend %list;
   flex-direction: column;
-  width: 100%;
 }
 
 .horizontalList {
@@ -60,6 +58,10 @@
   display: flex;
   flex: 1 1 100%;
 
+  @include mq($small-only) {
+    justify-content: center;
+  }
+
   .verticalList & {
     padding: calc(var(--line-height-computed) / 3) 0;
 
@@ -78,7 +80,7 @@
 
   &:hover,
   &:focus {
-    @extend %highContrastOutline;
+    @include highContrastOutline();
     cursor: pointer;
     background-color: var(--color-primary);
     color: var(--color-white);

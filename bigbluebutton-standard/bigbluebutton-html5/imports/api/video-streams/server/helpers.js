@@ -12,9 +12,9 @@ const getDeviceId = (stream) => {
   return stream;
 };
 
-const getUserName = (userId, meetingId) => {
+const getUserName = (userId) => {
   const user = Users.findOne(
-    { userId, meetingId },
+    { userId },
     { fields: { name: 1 } },
   );
   if (user) return user.name;

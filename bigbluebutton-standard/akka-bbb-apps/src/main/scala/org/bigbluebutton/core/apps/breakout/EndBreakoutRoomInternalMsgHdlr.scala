@@ -2,6 +2,7 @@ package org.bigbluebutton.core.apps.breakout
 
 import org.bigbluebutton.core.api.EndBreakoutRoomInternalMsg
 import org.bigbluebutton.core.bus.{ InternalEventBus }
+import org.bigbluebutton.core.domain.MeetingEndReason
 import org.bigbluebutton.core.running.{ BaseMeetingActor, HandlerHelpers, LiveMeeting, OutMsgRouter }
 
 trait EndBreakoutRoomInternalMsgHdlr extends HandlerHelpers {
@@ -13,6 +14,6 @@ trait EndBreakoutRoomInternalMsgHdlr extends HandlerHelpers {
 
   def handleEndBreakoutRoomInternalMsg(msg: EndBreakoutRoomInternalMsg): Unit = {
     log.info("Breakout room {} ended by parent meeting {}.", msg.breakoutId, msg.parentId)
-    sendEndMeetingDueToExpiry(msg.reason, eventBus, outGW, liveMeeting, "system")
+    sendEndMeetingDueToExpiry(MeetingEndReason.ENDED_BY_PARENT, eventBus, outGW, liveMeeting)
   }
 }

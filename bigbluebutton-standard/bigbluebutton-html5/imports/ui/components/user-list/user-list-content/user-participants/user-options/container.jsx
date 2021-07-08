@@ -4,16 +4,15 @@ import Auth from '/imports/ui/services/auth';
 import Meetings from '/imports/api/meetings';
 import ActionsBarService from '/imports/ui/components/actions-bar/service';
 import UserListService from '/imports/ui/components/user-list/service';
-import WaitingUsersService from '/imports/ui/components/waiting-users/service';
 import logger from '/imports/startup/client/logger';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, intlShape } from 'react-intl';
 import { notify } from '/imports/ui/services/notification';
 import UserOptions from './component';
 
 const propTypes = {
   users: PropTypes.arrayOf(Object).isRequired,
-  clearAllEmojiStatus: PropTypes.func.isRequired,
-  intl: PropTypes.object.isRequired,
+  setEmojiStatus: PropTypes.func.isRequired,
+  intl: intlShape.isRequired,
 };
 
 const intlMessages = defineMessages({
@@ -23,8 +22,6 @@ const intlMessages = defineMessages({
   },
 });
 
-const dynamicGuestPolicy = Meteor.settings.public.app.dynamicGuestPolicy;
-
 const meetingMuteDisabledLog = () => logger.info({
   logCode: 'useroptions_unmute_all',
   extraInfo: { logType: 'moderator_action' },
@@ -33,13 +30,12 @@ const meetingMuteDisabledLog = () => logger.info({
 const UserOptionsContainer = withTracker((props) => {
   const {
     users,
-    clearAllEmojiStatus,
+    setEmojiStatus,
     intl,
   } = props;
 
   const toggleStatus = () => {
-    clearAllEmojiStatus(users);
-
+    users.forEach(user => setEmojiStatus(user.userId, 'none'));
     notify(
       intl.formatMessage(intlMessages.clearStatusMessage), 'info', 'clear_status',
     );
@@ -88,10 +84,8 @@ const UserOptionsContainer = withTracker((props) => {
     isBreakoutEnabled: ActionsBarService.isBreakoutEnabled(),
     isBreakoutRecordable: ActionsBarService.isBreakoutRecordable(),
     users: ActionsBarService.users(),
-    guestPolicy: WaitingUsersService.getGuestPolicy(),
     isMeteorConnected: Meteor.status().connected,
     meetingName: getMeetingName(),
-    dynamicGuestPolicy,
   };
 })(UserOptions);
 

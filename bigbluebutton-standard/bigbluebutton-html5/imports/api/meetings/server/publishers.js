@@ -2,21 +2,17 @@ import { Meteor } from 'meteor/meteor';
 import Meetings, { RecordMeetings, MeetingTimeRemaining } from '/imports/api/meetings';
 import Users from '/imports/api/users';
 import Logger from '/imports/startup/server/logger';
-import AuthTokenValidation, { ValidationStates } from '/imports/api/auth-token-validation';
+import { extractCredentials } from '/imports/api/common/server/helpers';
 
 const ROLE_MODERATOR = Meteor.settings.public.user.role_moderator;
 
 function meetings(role) {
-  const tokenValidation = AuthTokenValidation.findOne({ connectionId: this.connection.id });
-
-  if (!tokenValidation || tokenValidation.validationStatus !== ValidationStates.VALIDATED) {
-    Logger.warn(`Publishing Meetings was requested by unauth connection ${this.connection.id}`);
+  if (!this.userId) {
     return Meetings.find({ meetingId: '' });
   }
+  const { meetingId, requesterUserId } = extractCredentials(this.userId);
 
-  const { meetingId, userId } = tokenValidation;
-
-  Logger.debug('Publishing meeting', { meetingId, userId });
+  Logger.debug('Publishing meeting', { meetingId, requesterUserId });
 
   const selector = {
     $or: [
@@ -24,7 +20,7 @@ function meetings(role) {
     ],
   };
 
-  const User = Users.findOne({ userId, meetingId }, { fields: { role: 1 } });
+  const User = Users.findOne({ userId: requesterUserId, meetingId }, { fields: { role: 1 } });
   if (!!User && User.role === ROLE_MODERATOR) {
     selector.$or.push({
       'meetingProp.isBreakout': true,
@@ -50,16 +46,10 @@ function publish(...args) {
 Meteor.publish('meetings', publish);
 
 function recordMeetings() {
-  const tokenValidation = AuthTokenValidation.findOne({ connectionId: this.connection.id });
-
-  if (!tokenValidation || tokenValidation.validationStatus !== ValidationStates.VALIDATED) {
-    Logger.warn(`Publishing RecordMeetings was requested by unauth connection ${this.connection.id}`);
+  if (!this.userId) {
     return RecordMeetings.find({ meetingId: '' });
   }
-
-  const { meetingId, userId } = tokenValidation;
-
-  Logger.debug(`Publishing RecordMeetings for ${meetingId} ${userId}`);
+  const { meetingId } = extractCredentials(this.userId);
 
   return RecordMeetings.find({ meetingId });
 }
@@ -71,15 +61,10 @@ function recordPublish(...args) {
 Meteor.publish('record-meetings', recordPublish);
 
 function meetingTimeRemaining() {
-  const tokenValidation = AuthTokenValidation.findOne({ connectionId: this.connection.id });
-
-  if (!tokenValidation || tokenValidation.validationStatus !== ValidationStates.VALIDATED) {
-    Logger.warn(`Publishing MeetingTimeRemaining was requested by unauth connection ${this.connection.id}`);
+  if (!this.userId) {
     return MeetingTimeRemaining.find({ meetingId: '' });
   }
-
-  const { meetingId, userId } = tokenValidation;
-  Logger.debug(`Publishing MeetingTimeRemaining for ${meetingId} ${userId}`);
+  const { meetingId } = extractCredentials(this.userId);
 
   return MeetingTimeRemaining.find({ meetingId });
 }

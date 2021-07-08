@@ -1,4 +1,4 @@
-@import "../../stylesheets/variables/breakpoints";
+@import "../../stylesheets/variables/_all";
 
 :root {
   --mobile-nav-height: 5rem;
@@ -11,6 +11,7 @@
 .navbar {
   display: flex;
   flex-direction: column;
+  height:var(--mobile-nav-height);
 }
 
 .top,
@@ -108,8 +109,6 @@
     box-shadow: none;
   }
 
-  z-index: 3;
-
   &:hover,
   &:focus {
     span {
@@ -120,6 +119,5 @@
   }
 }
 
-.dropdown{
-  z-index: 5;
+.btnSettings {
 }

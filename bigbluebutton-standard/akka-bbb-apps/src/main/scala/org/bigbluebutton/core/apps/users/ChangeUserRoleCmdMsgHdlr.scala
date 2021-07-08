@@ -21,24 +21,24 @@ trait ChangeUserRoleCmdMsgHdlr extends RightsManagementTrait {
         uvo <- Users2x.findWithIntId(liveMeeting.users2x, msg.body.userId)
       } yield {
 
-        val userRole = if (msg.body.role == Roles.MODERATOR_ROLE) Roles.MODERATOR_ROLE else Roles.VIEWER_ROLE
+        val userRole = if (uvo.role == Roles.MODERATOR_ROLE) "MODERATOR" else "VIEWER"
         for {
           // Update guest from waiting list
           u <- RegisteredUsers.findWithUserId(uvo.intId, liveMeeting.registeredUsers)
         } yield {
           RegisteredUsers.updateUserRole(liveMeeting.registeredUsers, u, userRole)
         }
-        val promoteGuest = !liveMeeting.props.usersProp.authenticatedGuest
-        if (msg.body.role == Roles.MODERATOR_ROLE && (!uvo.guest || promoteGuest)) {
+
+        if (msg.body.role == Roles.MODERATOR_ROLE && !uvo.guest) {
           // Promote non-guest users.
           Users2x.changeRole(liveMeeting.users2x, uvo, msg.body.role)
           val event = buildUserRoleChangedEvtMsg(liveMeeting.props.meetingProp.intId, msg.body.userId,
-            msg.body.changedBy, Roles.MODERATOR_ROLE)
+            msg.body.changedBy, "MODERATOR")
           outGW.send(event)
         } else if (msg.body.role == Roles.VIEWER_ROLE) {
           Users2x.changeRole(liveMeeting.users2x, uvo, msg.body.role)
           val event = buildUserRoleChangedEvtMsg(liveMeeting.props.meetingProp.intId, msg.body.userId,
-            msg.body.changedBy, Roles.VIEWER_ROLE)
+            msg.body.changedBy, "VIEWER")
           outGW.send(event)
         }
       }

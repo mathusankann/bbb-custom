@@ -1,3 +1,6 @@
+@import "/imports/ui/stylesheets/variables/palette";
+@import "/imports/ui/stylesheets/variables/general";
+
 @mixin elementFocus($color: var(--color-primary)) {
   &:focus {
     outline: none;

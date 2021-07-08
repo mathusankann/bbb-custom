@@ -22,7 +22,6 @@ export default function addGroupChat(meetingId, chat) {
     name: chat.name,
     access: chat.access,
     users: chat.users.map(u => u.id),
-    participants: chat.users,
     createdBy: chat.createdBy.id,
   };
 

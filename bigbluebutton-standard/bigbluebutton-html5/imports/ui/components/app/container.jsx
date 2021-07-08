@@ -3,7 +3,6 @@ import { withTracker } from 'meteor/react-meteor-data';
 import { defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import Auth from '/imports/ui/services/auth';
-import AuthTokenValidation from '/imports/api/auth-token-validation';
 import Users from '/imports/api/users';
 import Meetings from '/imports/api/meetings';
 import { notify } from '/imports/ui/services/notification';
@@ -13,6 +12,7 @@ import getFromUserSettings from '/imports/ui/services/users-settings';
 import deviceInfo from '/imports/utils/deviceInfo';
 import UserInfos from '/imports/api/users-infos';
 import { startBandwidthMonitoring, updateNavigatorConnection } from '/imports/ui/services/network-information/index';
+import logger from '/imports/startup/client/logger';
 
 import {
   getFontSize,
@@ -78,26 +78,36 @@ const currentUserEmoji = currentUser => (currentUser ? {
   });
 
 export default injectIntl(withModalMounter(withTracker(({ intl, baseControls }) => {
-  const authTokenValidation = AuthTokenValidation.findOne({}, { sort: { updatedAt: -1 } });
-
-  if (authTokenValidation.connectionId !== Meteor.connection._lastSessionId) {
-    endMeeting('403');
-  }
-
-  Users.find({ userId: Auth.userID, meetingId: Auth.meetingID }).observe({
-    removed() {
-      endMeeting('403');
-    },
-  });
-
-  const currentUser = Users.findOne({ userId: Auth.userID }, { fields: { approved: 1, emoji: 1, userId: 1, presenter: 1 } });
+  const currentUser = Users.findOne({ userId: Auth.userID }, { fields: { approved: 1, emoji: 1 } });
   const currentMeeting = Meetings.findOne({ meetingId: Auth.meetingID },
-    { fields: { publishedPoll: 1, voiceProp: 1, randomlySelectedUser: 1 } });
-  const { publishedPoll, voiceProp, randomlySelectedUser } = currentMeeting;
+    { fields: { publishedPoll: 1, voiceProp: 1 } });
+  const { publishedPoll, voiceProp } = currentMeeting;
 
   if (!currentUser.approved) {
     baseControls.updateLoadingState(intl.formatMessage(intlMessages.waitingApprovalMessage));
   }
+
+  // Check if user is removed out of the session
+  Users.find({ userId: Auth.userID }, { fields: { connectionId: 1, ejected: 1 } }).observeChanges({
+    changed(id, fields) {
+      const hasNewConnection = 'connectionId' in fields && (fields.connectionId !== Meteor.connection._lastSessionId);
+
+      if (hasNewConnection) {
+        logger.info({
+          logCode: 'user_connection_id_changed',
+          extraInfo: {
+            currentConnectionId: fields.connectionId,
+            previousConnectionId: Meteor.connection._lastSessionId,
+          },
+        }, 'User connectionId changed ');
+        endMeeting('401');
+      }
+
+      if (fields.ejected) {
+        endMeeting('403');
+      }
+    },
+  });
 
   const UserInfo = UserInfos.find({
     meetingId: Auth.meetingID,
@@ -114,16 +124,13 @@ export default injectIntl(withModalMounter(withTracker(({ intl, baseControls }) 
     UserInfo,
     notify,
     validIOSVersion,
-    isPhone: deviceInfo.isPhone,
+    isPhone: deviceInfo.type().isPhone,
     isRTL: document.documentElement.getAttribute('dir') === 'rtl',
     meetingMuted: voiceProp.muteOnStart,
     currentUserEmoji: currentUserEmoji(currentUser),
     hasPublishedPoll: publishedPoll,
     startBandwidthMonitoring,
     handleNetworkConnection: () => updateNavigatorConnection(navigator.connection),
-    randomlySelectedUser,
-    currentUserId: currentUser.userId,
-    isPresenter: currentUser.presenter,
   };
 })(AppContainer)));
 

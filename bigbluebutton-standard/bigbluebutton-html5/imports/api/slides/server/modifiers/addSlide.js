@@ -123,6 +123,7 @@ export default function addSlide(meetingId, podId, presentationId, slide) {
         } else if (numberAffected) {
           Logger.info(`Upserted slide id=${slideId} pod=${podId} presentation=${presentationId}`);
         }
+
       } catch (err) {
         Logger.error(`Error on adding slide to collection: ${err}`);
       }

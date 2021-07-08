@@ -1,5 +1,6 @@
+@import "../../../stylesheets/variables/_all";
 @import '/imports/ui/stylesheets/mixins/_indicators';
-@import "/imports/ui/stylesheets/variables/placeholders";
+@import "../../../stylesheets/variables/typography";
 
 .visuallyHidden {
   position: absolute;
@@ -65,6 +66,7 @@
   color: var(--color-white);
   font-size: var(--font-size-base);
   padding: 0;
+  margin-left: var(--sm-padding-x);
   margin-right: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -85,12 +87,6 @@
   }
 }
 
-.presentationTitleMargin {
-  [dir="ltr"] & {
-    margin-right: var(--sm-padding-x);
-  }
-}
-
 .recordingStatusViewOnly {
   display: flex;
 }
@@ -103,13 +99,13 @@
 
 .recordingIndicator {
   &:hover {
-    @extend %highContrastOutline;
+    @include highContrastOutline();
   }
 
   &:active,
   &:focus,
   &:focus-within {
-    @extend %highContrastOutline;
+    @include highContrastOutline();
     outline-style: solid;
   }
 }

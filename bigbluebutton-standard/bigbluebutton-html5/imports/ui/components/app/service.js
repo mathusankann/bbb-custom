@@ -2,7 +2,6 @@ import Breakouts from '/imports/api/breakouts';
 import Meetings from '/imports/api/meetings';
 import Settings from '/imports/ui/services/settings';
 import Auth from '/imports/ui/services/auth/index';
-import deviceInfo from '/imports/utils/deviceInfo';
 
 const getFontSize = () => {
   const applicationSettings = Settings.application;
@@ -18,10 +17,12 @@ function meetingIsBreakout() {
 }
 
 const validIOSVersion = () => {
-  const { isIos, isIosVersionSupported } = deviceInfo;
-
-  if (isIos) {
-    return isIosVersionSupported();
+  const SUPPORTED_OS_VERSION = 12.2;
+  const iosMatch = navigator.userAgent.match(/OS (\d+)_(\d+)/);
+  if (iosMatch) {
+    const versionNumber = iosMatch[0].split(' ')[1].replace('_', '.');
+    const isInvalid = parseFloat(versionNumber) < SUPPORTED_OS_VERSION;
+    if (isInvalid) return false;
   }
   return true;
 };

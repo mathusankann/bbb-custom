@@ -1,9 +1,14 @@
 import React, { createContext, useReducer, useEffect } from 'react';
-import Storage from '/imports/ui/services/storage/session';
+import Storage from '../../../services/storage/session';
 
 export const WebcamDraggableContext = createContext();
 
 const initialState = {
+  placement: 'top',
+  mediaSize: {
+    width: 0,
+    height: 0,
+  },
   videoListSize: {
     width: 0,
     height: 0,
@@ -20,7 +25,6 @@ const initialState = {
     x: 0,
     y: 0,
   },
-  optimalGrid: {},
   dragging: false,
   videoRef: null,
   videoListRef: null,
@@ -29,6 +33,33 @@ const initialState = {
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case 'setplacementToTop': {
+      return {
+        ...state,
+        placement: 'top',
+      };
+    }
+    case 'setplacementToBottom': {
+      return {
+        ...state,
+        placement: 'bottom',
+      };
+    }
+    case 'setplacementToFloating': {
+      return {
+        ...state,
+        placement: 'floating',
+      };
+    }
+    case 'setMediaSize': {
+      return {
+        ...state,
+        mediaSize: {
+          width: action.value.width,
+          height: action.value.height,
+        },
+      };
+    }
     case 'setVideoListSize': {
       return {
         ...state,
@@ -62,6 +93,15 @@ const reducer = (state, action) => {
         },
       };
     }
+    case 'setLastPosition': {
+      return {
+        ...state,
+        lastPosition: {
+          x: action.value.x,
+          y: action.value.y,
+        },
+      };
+    }
     case 'setVideoRef': {
       return {
         ...state,
@@ -72,12 +112,6 @@ const reducer = (state, action) => {
       return {
         ...state,
         videoListRef: action.value,
-      };
-    }
-    case 'setOptimalGrid': {
-      return {
-        ...state,
-        optimalGrid: action.value,
       };
     }
     case 'dragStart': {
@@ -112,21 +146,13 @@ const ContextConsumer = Component => props => (
 
 const ContextProvider = (props) => {
   const [webcamDraggableState, webcamDraggableDispatch] = useReducer(reducer, initialState);
-  const {
-    placement,
-    lastPosition,
-    lastPlacementLandscape,
-    lastPlacementPortrait,
-  } = webcamDraggableState;
+  const { placement, lastPosition } = webcamDraggableState;
   const { children } = props;
   useEffect(() => {
-    Storage.setItem('webcamLastPlacementLandscape', lastPlacementLandscape);
-    Storage.setItem('webcamlastPlacementPortrait', lastPlacementPortrait);
+    Storage.setItem('webcamPlacement', placement);
     Storage.setItem('webcamLastPosition', lastPosition);
   }, [
     placement,
-    lastPlacementLandscape,
-    lastPlacementPortrait,
     lastPosition,
   ]);
 

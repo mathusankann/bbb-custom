@@ -1,5 +1,4 @@
-@import "../../../stylesheets/variables/breakpoints";
-@import "/imports/ui/stylesheets/variables/placeholders";
+@import "../../../stylesheets/variables/_all";
 @import "/imports/ui/stylesheets/mixins/_indicators";
 
 :root {
@@ -8,7 +7,7 @@
 }
 
 .modal {
-  @extend %highContrastOutline;
+  @include highContrastOutline();
   outline-style: solid;
   display: flex;
   flex-direction: column;

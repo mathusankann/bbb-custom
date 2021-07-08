@@ -82,10 +82,6 @@ public abstract class AbstractCommandHandler extends
     return stdoutBuilder.indexOf(value) > -1;
   }
 
-  protected Boolean stdoutEquals(String value) {
-    return stdoutBuilder.toString().trim().equals(value);
-  }
-
   protected Boolean stderrContains(String value) {
     return stderrBuilder.indexOf(value) > -1;
   }
@@ -93,9 +89,4 @@ public abstract class AbstractCommandHandler extends
   public Boolean isCommandSuccessful() {
     return !exitedWithError();
   }
-
-  public Boolean isCommandTimeout() {
-    return exitCode == 124;
-  }
-
 }

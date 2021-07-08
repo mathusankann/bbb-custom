@@ -1,19 +1,15 @@
 import { Meteor } from 'meteor/meteor';
 import Logger from '/imports/startup/server/logger';
 import VideoStreams from '/imports/api/video-streams';
-import AuthTokenValidation, { ValidationStates } from '/imports/api/auth-token-validation';
+import { extractCredentials } from '/imports/api/common/server/helpers';
 
 function videoStreams() {
-  const tokenValidation = AuthTokenValidation.findOne({ connectionId: this.connection.id });
-
-  if (!tokenValidation || tokenValidation.validationStatus !== ValidationStates.VALIDATED) {
-    Logger.warn(`Publishing VideoStreams was requested by unauth connection ${this.connection.id}`);
+  if (!this.userId) {
     return VideoStreams.find({ meetingId: '' });
   }
+  const { meetingId } = extractCredentials(this.userId);
 
-  const { meetingId, userId } = tokenValidation;
-
-  Logger.debug('Publishing VideoStreams', { meetingId, userId });
+  Logger.debug('Publishing video users', { meetingId });
 
   const selector = {
     meetingId,

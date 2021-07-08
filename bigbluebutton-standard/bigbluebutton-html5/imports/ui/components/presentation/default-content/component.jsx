@@ -4,6 +4,8 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import cx from 'classnames';
 import { styles } from './styles.scss';
 
+const LAYOUT_CONFIG = Meteor.settings.public.layout;
+
 export default (props) => {
   const { autoSwapLayout, hidePresentation } = props;
   return (

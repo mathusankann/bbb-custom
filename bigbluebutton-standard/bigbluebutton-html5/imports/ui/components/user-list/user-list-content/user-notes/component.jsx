@@ -27,7 +27,7 @@ const intlMessages = defineMessages({
     description: 'Aria label for notes unread content',
   },
   locked: {
-    id: 'app.note.locked',
+    id: 'app.userList.locked',
     description: '',
   },
   byModerator: {
@@ -48,9 +48,7 @@ class UserNotes extends Component {
   componentDidMount() {
     const { revs } = this.props;
 
-    const lastRevs = NoteService.getLastRevs();
-
-    if (revs !== 0 && revs > lastRevs) this.setUnread(true);
+    if (revs !== 0) this.setState({ unread: true });
   }
 
   componentDidUpdate(prevProps) {
@@ -58,16 +56,12 @@ class UserNotes extends Component {
     const { unread } = this.state;
 
     if (!isPanelOpened && !unread) {
-      if (prevProps.revs !== revs) this.setUnread(true);
+      if (prevProps.revs !== revs) this.setState({ unread: true });
     }
 
     if (isPanelOpened && unread) {
-      this.setUnread(false);
+      this.setState({ unread: false });
     }
-  }
-
-  setUnread(unread) {
-    this.setState({ unread });
   }
 
   renderNotes() {
@@ -96,11 +90,10 @@ class UserNotes extends Component {
         tabIndex={0}
         className={styles.listItem}
         onClick={NoteService.toggleNotePanel}
-        onKeyPress={() => { }}
       >
         <Icon iconName="copy" />
         <div aria-hidden>
-          <div className={styles.noteTitle} data-test="sharedNotes">
+          <div className={styles.noteTitle}>
             {intl.formatMessage(intlMessages.sharedNotes)}
           </div>
           {disableNote
@@ -109,7 +102,8 @@ class UserNotes extends Component {
                 <Icon iconName="lock" />
                 <span id="lockedNote">{`${intl.formatMessage(intlMessages.locked)} ${intl.formatMessage(intlMessages.byModerator)}`}</span>
               </div>
-            ) : null}
+            ) : null
+          }
         </div>
         {notification}
       </div>
@@ -117,7 +111,7 @@ class UserNotes extends Component {
   }
 
   render() {
-    const { intl } = this.props;
+    const { intl, disableNote } = this.props;
 
     if (!NoteService.isEnabled()) return null;
 

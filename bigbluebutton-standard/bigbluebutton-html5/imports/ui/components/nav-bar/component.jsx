@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Session } from 'meteor/session';
 import cx from 'classnames';
@@ -8,12 +8,11 @@ import getFromUserSettings from '/imports/ui/services/users-settings';
 import { defineMessages, injectIntl } from 'react-intl';
 import Icon from '../icon/component';
 import { styles } from './styles.scss';
-import Button from '/imports/ui/components/button/component';
+import Button from '../button/component';
 import RecordingIndicator from './recording-indicator/container';
 import TalkingIndicatorContainer from '/imports/ui/components/nav-bar/talking-indicator/container';
-import ConnectionStatusButton from '/imports/ui/components/connection-status/button/container';
-import ConnectionStatusService from '/imports/ui/components/connection-status/service';
 import SettingsDropdownContainer from './settings-dropdown/container';
+
 
 const intlMessages = defineMessages({
   toggleUserListLabel: {
@@ -42,7 +41,7 @@ const defaultProps = {
   shortcuts: '',
 };
 
-class NavBar extends Component {
+class NavBar extends PureComponent {
   static handleToggleUserList() {
     Session.set(
       'openPanel',
@@ -51,8 +50,6 @@ class NavBar extends Component {
         : 'userlist',
     );
     Session.set('idChatOpen', '');
-
-    window.dispatchEvent(new Event('panelChanged'));
   }
 
   componentDidMount() {
@@ -75,7 +72,6 @@ class NavBar extends Component {
   render() {
     const {
       hasUnreadMessages,
-      hasUnreadNotes,
       isExpanded,
       intl,
       shortcuts: TOGGLE_USERLIST_AK,
@@ -84,29 +80,27 @@ class NavBar extends Component {
       amIModerator,
     } = this.props;
 
-    const hasNotification = hasUnreadMessages || hasUnreadNotes;
+
     const toggleBtnClasses = {};
     toggleBtnClasses[styles.btn] = true;
-    toggleBtnClasses[styles.btnWithNotificationDot] = hasNotification;
+    toggleBtnClasses[styles.btnWithNotificationDot] = hasUnreadMessages;
 
     let ariaLabel = intl.formatMessage(intlMessages.toggleUserListAria);
-    ariaLabel += hasNotification ? (` ${intl.formatMessage(intlMessages.newMessages)}`) : '';
+    ariaLabel += hasUnreadMessages ? (` ${intl.formatMessage(intlMessages.newMessages)}`) : '';
 
     return (
-      <div
-        className={styles.navbar}
-      >
+      <div className={styles.navbar}>
         <div className={styles.top}>
           <div className={styles.left}>
             {!isExpanded ? null
               : <Icon iconName="left_arrow" className={styles.arrowLeft} />
             }
             <Button
+              data-test="userListToggleButton"
               onClick={NavBar.handleToggleUserList}
               ghost
               circle
               hideLabel
-              data-test={hasNotification ? 'hasUnreadMessages' : null}
               label={intl.formatMessage(intlMessages.toggleUserListLabel)}
               aria-label={ariaLabel}
               icon="user"
@@ -127,7 +121,6 @@ class NavBar extends Component {
             />
           </div>
           <div className={styles.right}>
-            {ConnectionStatusService.isEnabled() ? <ConnectionStatusButton /> : null}
             <SettingsDropdownContainer amIModerator={amIModerator} />
           </div>
         </div>

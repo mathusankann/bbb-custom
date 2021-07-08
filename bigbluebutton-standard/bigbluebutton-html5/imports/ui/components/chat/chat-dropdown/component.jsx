@@ -50,18 +50,8 @@ class ChatDropdown extends PureComponent {
 
   componentDidMount() {
     this.clipboard = new Clipboard('#clipboardButton', {
-      text: () => '',
+      text: () => ChatService.exportChat(ChatService.getPublicGroupMessages()),
     });
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { timeWindowsValues, users, intl } = this.props;
-    const { isSettingOpen } = this.state;
-    if (prevState.isSettingOpen !== isSettingOpen) {
-      this.clipboard = new Clipboard('#clipboardButton', {
-        text: () => ChatService.exportChat(timeWindowsValues, users, intl),
-      });
-    }
   }
 
   componentWillUnmount() {
@@ -82,12 +72,13 @@ class ChatDropdown extends PureComponent {
 
   getAvailableActions() {
     const {
-      intl, isMeteorConnected, amIModerator, meetingIsBreakout, meetingName, timeWindowsValues, users,
+      intl, isMeteorConnected, amIModerator, meetingIsBreakout,
     } = this.props;
 
     const clearIcon = 'delete';
     const saveIcon = 'download';
     const copyIcon = 'copy';
+
     return _.compact([
       <DropdownListItem
         data-test="chatSave"
@@ -97,14 +88,12 @@ class ChatDropdown extends PureComponent {
         onClick={() => {
           const link = document.createElement('a');
           const mimeType = 'text/plain';
-          const date = new Date();
-          const time = `${date.getHours()}-${date.getMinutes()}`;
-          const dateString = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}_${time}`;
-          link.setAttribute('download', `bbb-${meetingName}[public-chat]_${dateString}.txt`);
+
+          link.setAttribute('download', `public-chat-${Date.now()}.txt`);
           link.setAttribute(
             'href',
             `data: ${mimeType} ;charset=utf-8,
-            ${encodeURIComponent(ChatService.exportChat(timeWindowsValues, users, intl))}`,
+            ${encodeURIComponent(ChatService.exportChat(ChatService.getPublicGroupMessages()))}`,
           );
           link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
         }}

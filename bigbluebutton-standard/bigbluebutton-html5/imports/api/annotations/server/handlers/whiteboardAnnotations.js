@@ -15,14 +15,17 @@ export default function handleWhiteboardAnnotations({ header, body }, meetingId)
 
   check(annotations, Array);
   check(whiteboardId, String);
-  check(multiUser, Array);
+  check(multiUser, Boolean);
 
   clearAnnotations(meetingId, whiteboardId);
 
+  const annotationsAdded = [];
   _.each(annotations, (annotation) => {
     const { wbId, userId } = annotation;
-    addAnnotation(meetingId, wbId, userId, annotation);
+    annotationsAdded.push(addAnnotation(meetingId, wbId, userId, annotation));
   });
 
   modifyWhiteboardAccess(meetingId, whiteboardId, multiUser);
+
+  return annotationsAdded;
 }

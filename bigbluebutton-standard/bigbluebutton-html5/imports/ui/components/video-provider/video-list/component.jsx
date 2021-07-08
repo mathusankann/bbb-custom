@@ -14,8 +14,7 @@ import Button from '/imports/ui/components/button/component';
 
 const propTypes = {
   streams: PropTypes.arrayOf(PropTypes.object).isRequired,
-  onVideoItemMount: PropTypes.func.isRequired,
-  onVideoItemUnmount: PropTypes.func.isRequired,
+  onMount: PropTypes.func.isRequired,
   webcamDraggableDispatch: PropTypes.func.isRequired,
   intl: PropTypes.objectOf(Object).isRequired,
   swapLayout: PropTypes.bool.isRequired,
@@ -78,8 +77,6 @@ const findOptimalGrid = (canvasWidth, canvasHeight, gutter, aspectRatio, numItem
 };
 
 const ASPECT_RATIO = 4 / 3;
-const ACTION_NAME_FOCUS = 'focus';
-const ACTION_NAME_MIRROR = 'mirror';
 
 class VideoList extends Component {
   constructor(props) {
@@ -122,18 +119,16 @@ class VideoList extends Component {
 
     this.handleCanvasResize();
     window.addEventListener('resize', this.handleCanvasResize, false);
-    window.addEventListener('layoutSizesSets', this.handleCanvasResize, false);
     window.addEventListener('videoPlayFailed', this.handlePlayElementFailed);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleCanvasResize, false);
-    window.removeEventListener('layoutSizesSets', this.handleCanvasResize, false);
     window.removeEventListener('videoPlayFailed', this.handlePlayElementFailed);
   }
 
   setOptimalGrid() {
-    const { streams, webcamDraggableDispatch } = this.props;
+    const { streams } = this.props;
     let numItems = streams.length;
     if (numItems < 1 || !this.canvas || !this.grid) {
       return;
@@ -159,12 +154,6 @@ class VideoList extends Component {
         const betterThanCurrent = testGrid.filledArea > currentGrid.filledArea;
         return focusedConstraint && betterThanCurrent ? testGrid : currentGrid;
       }, { filledArea: 0 });
-    webcamDraggableDispatch(
-      {
-        type: 'setOptimalGrid',
-        value: optimalGrid,
-      },
-    );
     this.setState({
       optimalGrid,
     });
@@ -219,22 +208,22 @@ class VideoList extends Component {
     window.dispatchEvent(new Event('videoFocusChange'));
   }
 
-  mirrorCamera(stream) {
+  mirrorCamera(cameraId) {
     const { mirroredCameras } = this.state;
-    if (this.cameraIsMirrored(stream)) {
+    if (this.cameraIsMirrored(cameraId)) {
       this.setState({
-        mirroredCameras: mirroredCameras.filter(x => x != stream),
+        mirroredCameras: mirroredCameras.filter(x => x != cameraId),
       });
     } else {
       this.setState({
-        mirroredCameras: mirroredCameras.concat([stream]),
+        mirroredCameras: mirroredCameras.concat([cameraId]),
       });
     }
   }
 
-  cameraIsMirrored(stream) {
+  cameraIsMirrored(cameraId) {
     const { mirroredCameras } = this.state;
-    return mirroredCameras.indexOf(stream) >= 0;
+    return mirroredCameras.indexOf(cameraId) >= 0;
   }
 
   handleCanvasResize() {
@@ -299,54 +288,50 @@ class VideoList extends Component {
     const {
       intl,
       streams,
-      onVideoItemMount,
-      onVideoItemUnmount,
+      onMount,
       swapLayout,
     } = this.props;
     const { focusedId } = this.state;
 
     const numOfStreams = streams.length;
-    return streams.map((vs) => {
-      const { stream, userId, name } = vs;
-      const isFocused = focusedId === stream;
+    return streams.map((stream) => {
+      const { cameraId, userId, name } = stream;
+      const isFocused = focusedId === cameraId;
       const isFocusedIntlKey = !isFocused ? 'focus' : 'unfocus';
-      const isMirrored = this.cameraIsMirrored(stream);
+      const isMirrored = this.cameraIsMirrored(cameraId);
       let actions = [{
-        actionName: ACTION_NAME_MIRROR,
         label: intl.formatMessage(intlMessages['mirrorLabel']),
         description: intl.formatMessage(intlMessages['mirrorDesc']),
-        onClick: () => this.mirrorCamera(stream),
+        onClick: () => this.mirrorCamera(cameraId),
       }];
 
       if (numOfStreams > 2) {
         actions.push({
-          actionName: ACTION_NAME_FOCUS,
           label: intl.formatMessage(intlMessages[`${isFocusedIntlKey}Label`]),
           description: intl.formatMessage(intlMessages[`${isFocusedIntlKey}Desc`]),
-          onClick: () => this.handleVideoFocus(stream),
+          onClick: () => this.handleVideoFocus(cameraId),
         });
       }
 
       return (
         <div
-          key={stream}
+          key={cameraId}
           className={cx({
             [styles.videoListItem]: true,
-            [styles.focused]: focusedId === stream && numOfStreams > 2,
+            [styles.focused]: focusedId === cameraId && numOfStreams > 2,
           })}
         >
           <VideoListItemContainer
             numOfStreams={numOfStreams}
-            cameraId={stream}
+            cameraId={cameraId}
             userId={userId}
             name={name}
             mirrored={isMirrored}
             actions={actions}
-            onVideoItemMount={(videoRef) => {
+            onMount={(videoRef) => {
               this.handleCanvasResize();
-              onVideoItemMount(stream, videoRef);
+              onMount(cameraId, videoRef);
             }}
-            onVideoItemUnmount={onVideoItemUnmount}
             swapLayout={swapLayout}
           />
         </div>

@@ -151,9 +151,7 @@ public class User {
 	}
 	
 	public void addStream(String stream) {
-		if (!streams.contains(stream)) {
-			streams.add(stream);
-		}
+		streams.add(stream);
 	}
 	
 	public void removeStream(String stream) {

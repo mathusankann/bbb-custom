@@ -17,14 +17,6 @@ const messages = defineMessages({
     id: 'app.userList.locked',
     description: 'Text for identifying locked user',
   },
-  moderator: {
-    id: 'app.userList.moderator',
-    description: 'Text for identifying moderator user',
-  },
-  mobile: {
-    id: 'app.userList.mobile',
-    description: 'Text for identifying mobile user',
-  },
   guest: {
     id: 'app.userList.guest',
     description: 'Text for identifying guest user',
@@ -53,7 +45,6 @@ const propTypes = {
   isActionsOpen: PropTypes.bool.isRequired,
 };
 
-const LABEL = Meteor.settings.public.user.label;
 const ROLE_MODERATOR = Meteor.settings.public.user.role_moderator;
 
 const UserName = (props) => {
@@ -86,16 +77,8 @@ const UserName = (props) => {
     );
   }
 
-  if (user.role === ROLE_MODERATOR) {
-    if (LABEL.moderator) userNameSub.push(intl.formatMessage(messages.moderator));
-  }
-
-  if (user.mobile) {
-    if (LABEL.mobile) userNameSub.push(intl.formatMessage(messages.mobile));
-  }
-
   if (user.guest) {
-    if (LABEL.guest) userNameSub.push(intl.formatMessage(messages.guest));
+    userNameSub.push(intl.formatMessage(messages.guest));
   }
 
   return (
@@ -105,7 +88,7 @@ const UserName = (props) => {
       aria-label={userAriaLabel}
       aria-expanded={isActionsOpen}
     >
-      <span aria-hidden className={styles.userNameMain}>
+      <span className={styles.userNameMain}>
         <span>
           {user.name}
 &nbsp;
@@ -115,11 +98,7 @@ const UserName = (props) => {
       {
         userNameSub.length
           ? (
-            <span
-              aria-hidden
-              className={styles.userNameSub}
-              data-test={user.mobile ? 'mobileUser' : undefined}
-            >
+            <span className={styles.userNameSub}>
               {userNameSub.reduce((prev, curr) => [prev, ' | ', curr])}
             </span>
           )

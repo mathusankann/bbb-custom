@@ -1,34 +1,26 @@
 import { GroupChatMsg, UsersTyping } from '/imports/api/group-chat-msg';
-import Users from '/imports/api/users';
 import { Meteor } from 'meteor/meteor';
 
 import Logger from '/imports/startup/server/logger';
-import AuthTokenValidation, { ValidationStates } from '/imports/api/auth-token-validation';
+import { extractCredentials } from '/imports/api/common/server/helpers';
 
 function groupChatMsg(chatsIds) {
-  const tokenValidation = AuthTokenValidation.findOne({ connectionId: this.connection.id });
-
-  if (!tokenValidation || tokenValidation.validationStatus !== ValidationStates.VALIDATED) {
-    Logger.warn(`Publishing GroupChatMsg was requested by unauth connection ${this.connection.id}`);
+  if (!this.userId) {
     return GroupChatMsg.find({ meetingId: '' });
   }
-
-  const { meetingId, userId } = tokenValidation;
+  const { meetingId, requesterUserId } = extractCredentials(this.userId);
 
   const CHAT_CONFIG = Meteor.settings.public.chat;
   const PUBLIC_GROUP_CHAT_ID = CHAT_CONFIG.public_group_id;
 
-  Logger.debug('Publishing group-chat-msg', { meetingId, userId });
+  Logger.debug('Publishing group-chat-msg', { meetingId, requesterUserId });
 
-  const User = Users.findOne({ userId, meetingId });
-  const selector = {
-    timestamp: { $gte: User.authTokenValidatedTime },
+  return GroupChatMsg.find({
     $or: [
       { meetingId, chatId: { $eq: PUBLIC_GROUP_CHAT_ID } },
       { chatId: { $in: chatsIds } },
     ],
-  };
-  return GroupChatMsg.find(selector);
+  });
 }
 
 function publish(...args) {
@@ -39,16 +31,13 @@ function publish(...args) {
 Meteor.publish('group-chat-msg', publish);
 
 function usersTyping() {
-  const tokenValidation = AuthTokenValidation.findOne({ connectionId: this.connection.id });
-
-  if (!tokenValidation || tokenValidation.validationStatus !== ValidationStates.VALIDATED) {
-    Logger.warn(`Publishing users-typing was requested by unauth connection ${this.connection.id}`);
+  if (!this.userId) {
     return UsersTyping.find({ meetingId: '' });
   }
 
-  const { meetingId, userId } = tokenValidation;
+  const { meetingId, requesterUserId } = extractCredentials(this.userId);
 
-  Logger.debug('Publishing users-typing', { meetingId, userId });
+  Logger.debug('Publishing users-typing', { meetingId, requesterUserId });
 
   return UsersTyping.find({ meetingId });
 }

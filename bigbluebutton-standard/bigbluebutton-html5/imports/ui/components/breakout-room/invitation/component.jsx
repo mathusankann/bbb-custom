@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Session } from 'meteor/session';
 import { withModalMounter } from '/imports/ui/components/modal/service';
 import BreakoutJoinConfirmation from '/imports/ui/components/breakout-join-confirmation/container';
-import BreakoutService from '../service';
 
 const BREAKOUT_MODAL_DELAY = 200;
 
@@ -73,14 +72,13 @@ class BreakoutRoomInvitation extends Component {
       closeBreakoutJoinConfirmation(mountModal);
     }
 
-    if (hasBreakouts && !breakoutUserIsIn && BreakoutService.checkInviteModerators()) {
+    if (hasBreakouts && !breakoutUserIsIn) {
       // Have to check for freeJoin breakouts first because currentBreakoutUser will
       // populate after a room has been joined
-      const breakoutRoom = getBreakoutByUser(currentBreakoutUser);
       const freeJoinBreakout = breakouts.find(breakout => breakout.freeJoin);
       if (freeJoinBreakout) {
         if (!didSendBreakoutInvite) {
-          this.inviteUserToBreakout(breakoutRoom || freeJoinBreakout);
+          this.inviteUserToBreakout(freeJoinBreakout);
           this.setState({ didSendBreakoutInvite: true });
         }
       } else if (currentBreakoutUser) {
@@ -88,6 +86,7 @@ class BreakoutRoomInvitation extends Component {
         const oldCurrentUser = oldProps.currentBreakoutUser || {};
         const oldInsertedTime = oldCurrentUser.insertedTime;
         if (currentInsertedTime !== oldInsertedTime) {
+          const breakoutRoom = getBreakoutByUser(currentBreakoutUser);
           const breakoutId = Session.get('lastBreakoutOpened');
           if (breakoutRoom.breakoutId !== breakoutId) {
             this.inviteUserToBreakout(breakoutRoom);

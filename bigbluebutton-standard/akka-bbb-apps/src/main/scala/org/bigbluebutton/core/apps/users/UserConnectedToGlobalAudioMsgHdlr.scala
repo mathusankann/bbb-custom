@@ -40,9 +40,7 @@ trait UserConnectedToGlobalAudioMsgHdlr {
         talking = false,
         listenOnly = true,
         "kms",
-        System.currentTimeMillis(),
-        floor = false,
-        lastFloorTime = "0",
+        System.currentTimeMillis()
       )
 
       VoiceUsers.add(liveMeeting.voiceUsers, vu)

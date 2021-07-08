@@ -26,14 +26,8 @@ const defaultProps = {
 export default class DropdownContent extends Component {
   render() {
     const {
-      placement,
-      children,
-      className,
-      dropdownToggle,
-      dropdownShow,
-      dropdownHide,
-      dropdownIsOpen,
-      keepOpen,
+      placement, children, className,
+      dropdownToggle, dropdownShow, dropdownHide, dropdownIsOpen,
       ...restProps
     } = this.props;
 
@@ -44,7 +38,6 @@ export default class DropdownContent extends Component {
       dropdownToggle,
       dropdownShow,
       dropdownHide,
-      keepOpen,
     }));
 
     return (

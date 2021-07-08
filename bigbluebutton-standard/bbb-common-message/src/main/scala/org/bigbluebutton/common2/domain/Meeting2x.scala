@@ -3,6 +3,7 @@ package org.bigbluebutton.common2.domain
 case class ConfigProps(defaultConfigToken: String, config: String)
 
 case class DurationProps(duration: Int, createdTime: Long, createdDate: String,
+                         maxInactivityTimeoutMinutes: Int, warnMinutesBeforeMax: Int,
                          meetingExpireIfNoUserJoinedInMinutes: Int, meetingExpireWhenLastUserLeftInMinutes: Int,
                          userInactivityInspectTimerInMinutes: Int, userInactivityThresholdInMinutes: Int, userActivitySignResponseDelayInMinutes: Int)
 
@@ -26,7 +27,7 @@ case class WelcomeProp(welcomeMsgTemplate: String, welcomeMsg: String, modOnlyMe
 
 case class VoiceProp(telVoice: String, voiceConf: String, dialNumber: String, muteOnStart: Boolean)
 
-case class UsersProp(maxUsers: Int, webcamsOnlyForModerator: Boolean, guestPolicy: String, allowModsToUnmuteUsers: Boolean, authenticatedGuest: Boolean)
+case class UsersProp(maxUsers: Int, webcamsOnlyForModerator: Boolean, guestPolicy: String, allowModsToUnmuteUsers: Boolean)
 
 case class MetadataProp(metadata: collection.immutable.Map[String, String])
 
@@ -44,10 +45,6 @@ case class LockSettingsProps(
     lockOnJoinConfigurable: Boolean
 )
 
-case class SystemProps(
-    html5InstanceId: Int
-)
-
 case class DefaultProps(
     meetingProp:       MeetingProp,
     breakoutProps:     BreakoutProps,
@@ -59,8 +56,7 @@ case class DefaultProps(
     usersProp:         UsersProp,
     metadataProp:      MetadataProp,
     screenshareProps:  ScreenshareProps,
-    lockSettingsProps: LockSettingsProps,
-    systemProps:       SystemProps
+    lockSettingsProps: LockSettingsProps
 )
 
 case class StartEndTimeStatus(startTime: Long, endTime: Long)

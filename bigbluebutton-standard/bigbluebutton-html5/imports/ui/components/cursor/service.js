@@ -25,17 +25,17 @@ export function publishCursorUpdate(payload) {
   if (cursorStreamListener) {
     const throttledEmit = throttle(cursorStreamListener.emit.bind(cursorStreamListener), 30, { trailing: true });
 
-    throttledEmit('publish', payload);
+    throttledEmit('publish', {
+      userId: Auth.userID,
+      payload,
+    });
   }
 
   return updateCursor(Auth.userID, payload);
 }
 
 export function initCursorStreamListener() {
-  logger.info({
-    logCode: 'init_cursor_stream_listener',
-    extraInfo: { meetingId: Auth.meetingID, userId: Auth.userID },
-  }, 'initCursorStreamListener called');
+  logger.info({ logCode: 'init_cursor_stream_listener' }, 'initCursorStreamListener called');
 
   /**
   * We create a promise to add the handlers after a ddp subscription stop.
@@ -60,12 +60,9 @@ export function initCursorStreamListener() {
     logger.debug({ logCode: 'cursor_stream_handler_attach' }, 'Attaching handlers for cursor stream');
 
     cursorStreamListener.on('message', ({ cursors }) => {
-      Object.keys(cursors).forEach((cursorId) => {
-        const cursor = cursors[cursorId];
-        const userId = cursor.userId;
-        delete cursor.userId;
+      Object.keys(cursors).forEach((userId) => {
         if (Auth.userID === userId) return;
-        updateCursor(userId, cursor);
+        updateCursor(userId, cursors[userId]);
       });
     });
   });

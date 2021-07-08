@@ -5,7 +5,7 @@ import WhiteboardMultiUser from '/imports/api/whiteboard-multi-user/';
 export default function modifyWhiteboardAccess(meetingId, whiteboardId, multiUser) {
   check(meetingId, String);
   check(whiteboardId, String);
-  check(multiUser, Array);
+  check(multiUser, Boolean);
 
   const selector = {
     meetingId,

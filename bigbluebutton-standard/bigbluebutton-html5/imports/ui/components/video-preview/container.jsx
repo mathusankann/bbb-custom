@@ -27,12 +27,12 @@ const isCamLocked = () => {
   return false;
 };
 
-export default withModalMounter(withTracker(({ mountModal }) => ({
-  startSharing: (deviceId) => {
+export default withModalMounter(withTracker(({ mountModal, fromInterface }) => ({
+  startSharing: deviceId => {
     mountModal(null);
     VideoService.joinVideo(deviceId);
   },
-  stopSharing: (deviceId) => {
+  stopSharing: deviceId => {
     mountModal(null);
     if (deviceId) {
       const stream = VideoService.getMyStream(deviceId);
@@ -48,5 +48,6 @@ export default withModalMounter(withTracker(({ mountModal }) => ({
   webcamDeviceId: Service.webcamDeviceId(),
   changeProfile: profileId => Service.changeProfile(profileId),
   hasMediaDevices: deviceInfo.hasMediaDevices,
+  skipVideoPreview: VideoService.getSkipVideoPreview(fromInterface),
   hasVideoStream: VideoService.hasVideoStream(),
 }))(VideoPreviewContainer));

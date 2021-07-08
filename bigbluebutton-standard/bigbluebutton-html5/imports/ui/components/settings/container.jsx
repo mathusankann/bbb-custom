@@ -20,5 +20,4 @@ export default withTracker(() => ({
   updateSettings,
   availableLocales: getAvailableLocales(),
   isModerator: getUserRoles() === 'MODERATOR',
-  showToggleLabel: false,
 }))(SettingsContainer);

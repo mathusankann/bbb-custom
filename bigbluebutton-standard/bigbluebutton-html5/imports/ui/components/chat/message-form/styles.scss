@@ -1,10 +1,6 @@
 @import "/imports/ui/stylesheets/mixins/focus";
 @import "/imports/ui/stylesheets/mixins/_indicators";
-@import "/imports/ui/stylesheets/variables/placeholders";
-
-:root {
-  --max-chat-input-msg-height: .93rem;
-}
+@import "/imports/ui/stylesheets/variables/_all";
 
 .form {
   flex-grow: 0;
@@ -13,7 +9,6 @@
   width: 100%;
   position: relative;
   margin-bottom: calc(-1 * var(--sm-padding-x));
-  margin-top: .2rem;
 }
 
 .wrapper {
@@ -79,10 +74,14 @@
     background-color: rgba(167,179,189,0.25);
   }
 
-  &:hover,
+  &:hover {
+    @include highContrastOutline();
+  }
+
   &:active,
   &:focus {
-    @extend %highContrastOutline;
+    @include highContrastOutline();
+    outline-style: solid;
   }
 }
 
@@ -107,14 +106,16 @@
   color: var(--color-gray-dark);
   text-align: left;
   padding: var(--border-size) 0;
-  position: relative;
+
+  [dir="rtl"] & {
+    text-align: right;
+  }
 }
 
-.error,
-.info,
 .spacer {
-  height: var(--max-chat-input-msg-height);
-  max-height: var(--max-chat-input-msg-height);
+  &:before {
+    content: "\00a0"; // non-breaking space
+  }
 }
 
 .coupleTyper,
@@ -139,15 +140,10 @@
   flex-direction: row;
 
   > span {
-    display: block;
-    margin-right: 0.05rem;
-    margin-left: 0.05rem;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
     line-height: var(--font-size-md);
-  }
-
-  text-align: left;
-  [dir="rtl"] & {
-    text-align: right;
   }
 }
 

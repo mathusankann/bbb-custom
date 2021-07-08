@@ -1,6 +1,5 @@
-@import "/imports/ui/stylesheets/variables/breakpoints";
+@import "/imports/ui/stylesheets/variables/_all";
 @import '/imports/ui/stylesheets/mixins/_indicators';
-@import "/imports/ui/stylesheets/variables/placeholders";
 
 .col,
 .formWrapper{
@@ -120,11 +119,11 @@
   padding: .4rem;
 
   &:hover {
-    @extend %highContrastOutline;
+    @include highContrastOutline();
   }
 
   &:focus {
-    @extend %highContrastOutline;
+    @include highContrastOutline();
     outline-style: solid;
   }
 }

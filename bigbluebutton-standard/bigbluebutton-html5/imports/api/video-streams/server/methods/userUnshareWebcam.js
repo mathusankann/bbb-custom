@@ -5,30 +5,24 @@ import RedisPubSub from '/imports/startup/server/redis';
 import { extractCredentials } from '/imports/api/common/server/helpers';
 
 export default function userUnshareWebcam(stream) {
-  try {
-    const REDIS_CONFIG = Meteor.settings.private.redis;
-    const CHANNEL = REDIS_CONFIG.channels.toAkkaApps;
-    const EVENT_NAME = 'UserBroadcastCamStopMsg';
-    const { meetingId, requesterUserId } = extractCredentials(this.userId);
+  const REDIS_CONFIG = Meteor.settings.private.redis;
+  const CHANNEL = REDIS_CONFIG.channels.toAkkaApps;
+  const EVENT_NAME = 'UserBroadcastCamStopMsg';
+  const { meetingId, requesterUserId } = extractCredentials(this.userId);
 
-    check(meetingId, String);
-    check(requesterUserId, String);
-    check(stream, String);
+  Logger.info(`user unsharing webcam: ${meetingId} ${requesterUserId}`);
 
-    Logger.info(`user unsharing webcam: ${meetingId} ${requesterUserId}`);
+  check(stream, String);
 
-    // const actionName = 'joinVideo';
-    /* TODO throw an error if user has no permission to share webcam
-    if (!isAllowedTo(actionName, credentials)) {
-      throw new Meteor.Error('not-allowed', `You are not allowed to share webcam`);
-    } */
+  // const actionName = 'joinVideo';
+  /* TODO throw an error if user has no permission to share webcam
+  if (!isAllowedTo(actionName, credentials)) {
+    throw new Meteor.Error('not-allowed', `You are not allowed to share webcam`);
+  } */
 
-    const payload = {
-      stream,
-    };
+  const payload = {
+    stream,
+  };
 
-    RedisPubSub.publishUserMessage(CHANNEL, EVENT_NAME, meetingId, requesterUserId, payload);
-  } catch (err) {
-    Logger.error(`Exception while invoking method userUnshareWebcam ${err.stack}`);
-  }
+  return RedisPubSub.publishUserMessage(CHANNEL, EVENT_NAME, meetingId, requesterUserId, payload);
 }

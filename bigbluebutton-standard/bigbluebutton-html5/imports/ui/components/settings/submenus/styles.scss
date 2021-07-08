@@ -1,7 +1,6 @@
 @import '/imports/ui/stylesheets/mixins/focus';
 @import '/imports/ui/stylesheets/mixins/_indicators';
-@import '/imports/ui/components/loading-screen/styles';
-@import "/imports/ui/stylesheets/variables/placeholders";
+@import '/imports/ui/stylesheets/variables/_all';
 
 .title {
   color: var(--color-gray-dark);
@@ -45,14 +44,6 @@
   }
 }
 
-.colHeading {
-  display: block;
-  text-align: center;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
 .label {
   color: var(--color-gray-label);
   font-size: 0.9rem;
@@ -84,9 +75,13 @@
   height: 1.75rem;
   padding: 1px;
 
-  &:hover,
+  &:hover {
+    @include highContrastOutline();
+  }
+
   &:focus {
-    @extend %highContrastOutline;
+    @include highContrastOutline();
+    outline-style: solid;
   }
 }
 
@@ -117,12 +112,5 @@
 
   [dir="rtl"] & {
     margin: 0 1rem 0 0;
-  }
-}
-
-.spinnerOverlay {
-  @extend .spinner;
-  & > div {
-    background-color: black;
   }
 }

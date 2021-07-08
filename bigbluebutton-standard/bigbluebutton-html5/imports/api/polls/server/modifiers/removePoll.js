@@ -17,6 +17,7 @@ export default function removePoll(meetingId, id) {
     if (numberAffected) {
       Logger.info(`Removed Poll id=${id}`);
     }
+
   } catch (err) {
     Logger.error(`Removing Poll from collection: ${err}`);
   }

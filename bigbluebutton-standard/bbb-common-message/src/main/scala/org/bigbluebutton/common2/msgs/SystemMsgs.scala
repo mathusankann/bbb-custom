@@ -35,28 +35,7 @@ case class GetAllMeetingsReqMsg(
     header: BbbCoreBaseHeader,
     body:   GetAllMeetingsReqMsgBody
 ) extends BbbCoreMsg
-case class GetAllMeetingsReqMsgBody(requesterId: String, html5InstanceId: Int)
-
-object GetRunningMeetingsReqMsg { val NAME = "GetRunningMeetingsReqMsg" }
-case class GetRunningMeetingsReqMsg(
-    header: BbbCoreBaseHeader,
-    body:   GetRunningMeetingsReqMsgBody
-) extends BbbCoreMsg
-case class GetRunningMeetingsReqMsgBody(requesterId: String)
-
-object GetRunningMeetingsRespMsg { val NAME = "GetRunningMeetingsRespMsg" }
-case class GetRunningMeetingsRespMsg(
-    header: BbbCoreBaseHeader,
-    body:   GetRunningMeetingsRespMsgBody
-) extends BbbCoreMsg
-case class GetRunningMeetingsRespMsgBody(meetings: Vector[String])
-
-object GetRunningMeetingStateReqMsg { val NAME = "GetRunningMeetingStateReqMsg" }
-case class GetRunningMeetingStateReqMsg(
-    header: BbbCoreBaseHeader,
-    body:   GetRunningMeetingStateReqMsgBody
-) extends BbbCoreMsg
-case class GetRunningMeetingStateReqMsgBody(meetingId: String)
+case class GetAllMeetingsReqMsgBody(requesterId: String)
 
 object PubSubPingSysReqMsg { val NAME = "PubSubPingSysReqMsg" }
 case class PubSubPingSysReqMsg(
@@ -159,19 +138,33 @@ case class MeetingTimeRemainingUpdateEvtMsg(
 ) extends BbbCoreMsg
 case class MeetingTimeRemainingUpdateEvtMsgBody(timeLeftInSec: Long)
 
+object MeetingInactivityWarningEvtMsg { val NAME = "MeetingInactivityWarningEvtMsg" }
+case class MeetingInactivityWarningEvtMsg(
+    header: BbbClientMsgHeader,
+    body:   MeetingInactivityWarningEvtMsgBody
+) extends BbbCoreMsg
+case class MeetingInactivityWarningEvtMsgBody(timeLeftInSec: Long)
+
+object MeetingIsActiveEvtMsg { val NAME = "MeetingIsActiveEvtMsg" }
+case class MeetingIsActiveEvtMsg(
+    header: BbbClientMsgHeader,
+    body:   MeetingIsActiveEvtMsgBody
+) extends BbbCoreMsg
+case class MeetingIsActiveEvtMsgBody(meetingId: String)
+
 object CheckAlivePingSysMsg { val NAME = "CheckAlivePingSysMsg" }
 case class CheckAlivePingSysMsg(
     header: BbbCoreBaseHeader,
     body:   CheckAlivePingSysMsgBody
 ) extends BbbCoreMsg
-case class CheckAlivePingSysMsgBody(system: String, bbbWebTimestamp: Long, akkaAppsTimestamp: Long)
+case class CheckAlivePingSysMsgBody(system: String, timestamp: Long)
 
 object CheckAlivePongSysMsg { val NAME = "CheckAlivePongSysMsg" }
 case class CheckAlivePongSysMsg(
     header: BbbCoreBaseHeader,
     body:   CheckAlivePongSysMsgBody
 ) extends BbbCoreMsg
-case class CheckAlivePongSysMsgBody(system: String, bbbWebTimestamp: Long, akkaAppsTimestamp: Long)
+case class CheckAlivePongSysMsgBody(system: String, timestamp: Long)
 
 object RecordingChapterBreakSysMsg { val NAME = "RecordingChapterBreakSysMsg" }
 case class RecordingChapterBreakSysMsg(
@@ -195,22 +188,6 @@ case class ValidateConnAuthTokenSysRespMsg(
 ) extends BbbCoreMsg
 case class ValidateConnAuthTokenSysRespMsgBody(meetingId: String, userId: String,
                                                connId: String, authzed: Boolean, app: String)
-
-object AddPadSysMsg { val NAME = "AddPadSysMsg" }
-case class AddPadSysMsg(header: BbbClientMsgHeader, body: AddPadSysMsgBody) extends StandardMsg
-case class AddPadSysMsgBody(padId: String, readOnlyId: String)
-
-object AddCaptionsPadsSysMsg { val NAME = "AddCaptionsPadsSysMsg" }
-case class AddCaptionsPadsSysMsg(header: BbbClientMsgHeader, body: AddCaptionsPadsSysMsgBody) extends StandardMsg
-case class AddCaptionsPadsSysMsgBody(padIds: Array[String])
-
-object AddPadEvtMsg { val NAME = "AddPadEvtMsg" }
-case class AddPadEvtMsg(header: BbbCoreHeaderWithMeetingId, body: AddPadEvtMsgBody) extends BbbCoreMsg
-case class AddPadEvtMsgBody(padId: String, readOnlyId: String)
-
-object AddCaptionsPadsEvtMsg { val NAME = "AddCaptionsPadsEvtMsg" }
-case class AddCaptionsPadsEvtMsg(header: BbbCoreHeaderWithMeetingId, body: AddCaptionsPadsEvtMsgBody) extends BbbCoreMsg
-case class AddCaptionsPadsEvtMsgBody(padIds: Array[String])
 
 object PublishedRecordingSysMsg { val NAME = "PublishedRecordingSysMsg" }
 case class PublishedRecordingSysMsg(header: BbbCoreBaseHeader, body: PublishedRecordingSysMsgBody) extends BbbCoreMsg

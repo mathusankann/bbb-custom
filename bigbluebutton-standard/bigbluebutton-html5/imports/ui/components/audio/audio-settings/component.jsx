@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, intlShape } from 'react-intl';
 import Button from '/imports/ui/components/button/component';
 import { withModalMounter } from '/imports/ui/components/modal/service';
 import DeviceSelector from '/imports/ui/components/audio/device-selector/component';
@@ -9,7 +9,7 @@ import cx from 'classnames';
 import { styles } from './styles';
 
 const propTypes = {
-  intl: PropTypes.object.isRequired,
+  intl: intlShape.isRequired,
   changeInputDevice: PropTypes.func.isRequired,
   changeOutputDevice: PropTypes.func.isRequired,
   handleBack: PropTypes.func.isRequired,

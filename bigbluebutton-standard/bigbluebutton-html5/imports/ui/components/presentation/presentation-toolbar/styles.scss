@@ -1,5 +1,5 @@
+@import "/imports/ui/stylesheets/variables/_all";
 @import "/imports/ui/stylesheets/mixins/_indicators";
-@import "/imports/ui/stylesheets/variables/placeholders";
 
 :root {
   --whiteboard-toolbar-padding-sm: .3rem; 
@@ -26,16 +26,6 @@
 
 .presentationBtn {
   position: relative;
-  color: var(--toolbar-button-color);
-  background-color: var(--color-off-white);
-  border-radius: 0;
-  box-shadow: none !important;
-  border: 0;
-
-  &:focus {
-    background-color: var(--color-off-white);
-    border: 0;
-  }
 }
 
 .presentationZoomControls {
@@ -79,9 +69,7 @@
     &:-moz-focusring {
       outline: none;
     }
-    border: 0;
-    background-color: var(--color-off-white);
-    cursor: pointer;
+
     margin: 0 var(--whiteboard-toolbar-margin) 0 0;
     padding: var(--whiteboard-toolbar-padding);
     padding-left: var(--whiteboard-toolbar-padding-sm);
@@ -95,6 +83,21 @@
     option {
       color: var(--toolbar-button-color);
       background-color: var(--color-off-white);
+    }
+  }
+
+  button,
+  select,
+  >div {
+    color: var(--toolbar-button-color);
+    background-color: var(--color-off-white);
+    border-radius: 0;
+    box-shadow: none !important;
+    border: 0;
+
+    &:focus {
+      background-color: var(--color-off-white);
+      border: 0;
     }
   }
 
@@ -163,11 +166,11 @@
   }
   
   &:hover {
-    @extend %highContrastOutline;
+    @include highContrastOutline();
   }
 
   &:focus {
-    @extend %highContrastOutline;
+    @include highContrastOutline();
     outline-style: solid;
   }
 }

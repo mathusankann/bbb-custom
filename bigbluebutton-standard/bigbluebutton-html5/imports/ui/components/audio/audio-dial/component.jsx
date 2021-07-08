@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, defineMessages } from 'react-intl';
+import { injectIntl, defineMessages, intlShape } from 'react-intl';
 import { styles } from './styles';
 
 const intlMessages = defineMessages({
@@ -23,7 +23,7 @@ const intlMessages = defineMessages({
 });
 
 const propTypes = {
-  intl: PropTypes.object.isRequired,
+  intl: intlShape.isRequired,
   formattedDialNum: PropTypes.string.isRequired,
   telVoice: PropTypes.string.isRequired,
 };
@@ -36,8 +36,6 @@ class AudioDial extends React.PureComponent {
       telVoice,
     } = this.props;
 
-    const formattedTelVoice = telVoice.replace(/(?=(\d{3})+(?!\d))/g, ' ');
-
     return (
       <span className={styles.help}>
         <div className={styles.text}>
@@ -47,7 +45,7 @@ class AudioDial extends React.PureComponent {
         <div className={styles.conferenceText}>
           {intl.formatMessage(intlMessages.audioDialConfrenceText)}
         </div>
-        <div className={styles.telvoice}>{formattedTelVoice}</div>
+        <div className={styles.telvoice}>{telVoice}</div>
         <div className={styles.tipBox}>
           <span className={styles.tipIndicator}>
             {`${intl.formatMessage(intlMessages.tipIndicator)}: `}

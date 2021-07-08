@@ -15,26 +15,22 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-async function createMeeting(params, meetingId, customParameter) {
-  const meetingID = meetingId || `random-${getRandomInt(1000000, 10000000).toString()}`;
+async function createMeeting(params) {
+  const meetingID = `random-${getRandomInt(1000000, 10000000).toString()}`;
   const mp = params.moderatorPW;
   const ap = params.attendeePW;
-  const query = customParameter !== undefined ? `name=${meetingID}&meetingID=${meetingID}&attendeePW=${ap}&moderatorPW=${mp}&joinViaHtml5=true`
-    + `&record=false&allowStartStopRecording=true&${customParameter}&autoStartRecording=false&welcome=${params.welcome}`
-    : `name=${meetingID}&meetingID=${meetingID}&attendeePW=${ap}&moderatorPW=${mp}&joinViaHtml5=true`
+  const query = `name=${meetingID}&meetingID=${meetingID}&attendeePW=${ap}&moderatorPW=${mp}&joinViaHtml5=true`
     + `&record=false&allowStartStopRecording=true&autoStartRecording=false&welcome=${params.welcome}`;
   const apicall = `create${query}${params.secret}`;
   const checksum = sha1(apicall);
   const url = `${params.server}/create?${query}&checksum=${checksum}`;
-
   const response = await axios.get(url, { adapter: http });
   return meetingID;
 }
 
-function getJoinURL(meetingID, params, moderator, customParameter) {
+function getJoinURL(meetingID, params, moderator) {
   const pw = moderator ? params.moderatorPW : params.attendeePW;
-  const query = customParameter !== undefined ? `fullName=${params.fullName}&joinViaHtml5=true&meetingID=${meetingID}&password=${pw}&${customParameter}`
-    : `fullName=${params.fullName}&joinViaHtml5=true&meetingID=${meetingID}&password=${pw}`;
+  const query = `fullName=${params.fullName}&joinViaHtml5=true&meetingID=${meetingID}&password=${pw}`;
   const apicall = `join${query}${params.secret}`;
   const checksum = sha1(apicall);
   const url = `${params.server}/join?${query}&checksum=${checksum}`;

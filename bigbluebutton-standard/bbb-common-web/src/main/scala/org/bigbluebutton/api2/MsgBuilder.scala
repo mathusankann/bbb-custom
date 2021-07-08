@@ -55,20 +55,11 @@ object MsgBuilder {
     BbbCommonEnvCoreMsg(envelope, req)
   }
 
-  def buildGuestWaitingLeftMsg(meetingId: String, userId: String): BbbCommonEnvCoreMsg = {
-    val routing = collection.immutable.HashMap("sender" -> "bbb-web")
-    val envelope = BbbCoreEnvelope(GuestWaitingLeftMsg.NAME, routing)
-    val header = BbbClientMsgHeader(GuestWaitingLeftMsg.NAME, meetingId, "not-used")
-    val body = GuestWaitingLeftMsgBody(userId)
-    val req = GuestWaitingLeftMsg(header, body)
-    BbbCommonEnvCoreMsg(envelope, req)
-  }
-
-  def buildCheckAlivePingSysMsg(system: String, bbbWebTimestamp: Long, akkaAppsTimestamp: Long): BbbCommonEnvCoreMsg = {
+  def buildCheckAlivePingSysMsg(system: String, timestamp: Long): BbbCommonEnvCoreMsg = {
     val routing = collection.immutable.HashMap("sender" -> "bbb-web")
     val envelope = BbbCoreEnvelope(CheckAlivePingSysMsg.NAME, routing)
     val header = BbbCoreBaseHeader(CheckAlivePingSysMsg.NAME)
-    val body = CheckAlivePingSysMsgBody(system, bbbWebTimestamp, akkaAppsTimestamp)
+    val body = CheckAlivePingSysMsgBody(system, timestamp)
     val req = CheckAlivePingSysMsg(header, body)
     BbbCommonEnvCoreMsg(envelope, req)
   }
@@ -280,17 +271,4 @@ object MsgBuilder {
     val req = DeletedRecordingSysMsg(header, body)
     BbbCommonEnvCoreMsg(envelope, req)
   }
-
-  def buildPresentationUploadedFileTooLargeErrorSysMsg(msg: UploadFileTooLargeMessage): BbbCommonEnvCoreMsg = {
-    val routing = collection.immutable.HashMap("sender" -> "bbb-web")
-    val envelope = BbbCoreEnvelope(PresentationUploadedFileTooLargeErrorSysPubMsg.NAME, routing)
-    val header = BbbClientMsgHeader(PresentationUploadedFileTooLargeErrorSysPubMsg.NAME, msg.meetingId, msg.authzToken)
-
-    val body = PresentationUploadedFileTooLargeErrorSysPubMsgBody(podId = msg.podId, messageKey = msg.key,
-      code = msg.key, presentationName = msg.filename, presentationToken = msg.authzToken, fileSize = msg.uploadedFileSize.intValue(), maxFileSize = msg.maxUploadFileSize)
-
-    val req = PresentationUploadedFileTooLargeErrorSysPubMsg(header, body)
-    BbbCommonEnvCoreMsg(envelope, req)
-  }
-
 }

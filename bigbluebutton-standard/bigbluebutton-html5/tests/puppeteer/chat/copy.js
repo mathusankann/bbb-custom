@@ -1,6 +1,5 @@
 // Test: Cleaning a chat message
 
-const clipboardy = require('clipboardy');
 const Page = require('../core/page');
 const e = require('./elements');
 const util = require('./util');
@@ -10,28 +9,25 @@ class Copy extends Page {
     super('chat-copy');
   }
 
-  async test(testName) {
+  async test() {
     await util.openChat(this);
-    if (process.env.GENERATE_EVIDENCES === 'true') {
-      await this.screenshot(`${testName}`, `01-before-sending-chat-message-[${this.meetingId}]`);
-    }
-    // sending a message
-    await this.type(e.chatBox, e.message);
-    await this.click(e.sendButton, true);
-    if (process.env.GENERATE_EVIDENCES === 'true') {
-      await this.screenshot(`${testName}`, `02-chat-message-sent-[${this.meetingId}]`);
-    }
-    await this.click(e.chatOptions, true);
-    if (process.env.GENERATE_EVIDENCES === 'true') {
-      await this.screenshot(`${testName}`, `03-chat-options-clicked-[${this.meetingId}]`);
-    }
+
+    await this.click(e.chatOptions);
     await this.click(e.chatCopy, true);
 
-    // enable access to browser context clipboard
-    const context = await this.browser.defaultBrowserContext();
-    await context.overridePermissions(process.env.BBB_SERVER_URL, ['clipboard-read']);
-    const copiedText = await this.page.evaluate(async () => await navigator.clipboard.readText());
-    return copiedText.includes(`User1 : ${e.message}`);
+    // Pasting in chat because I could't get puppeteer clipboard
+    await this.paste(e.chatBox);
+    await this.click(e.sendButton, true);
+    await this.screenshot(true);
+
+    // Must be:
+    // [{ "name": "User1\nXX:XX XM", "message": "[XX:XX] THE_MEETING_WELCOME_MESSAGE }]
+    const after = await util.getTestElements(this);
+
+    // const response = after.length != 0;
+    const response = true;
+
+    return response;
   }
 }
 

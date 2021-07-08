@@ -23,16 +23,7 @@ export default class ModalBase extends Component {
     if (!this.props.isOpen) return null;
 
     return (
-      <ReactModal
-        {...this.props}
-        parentSelector={() => {
-          if (document.fullscreenElement &&
-              document.fullscreenElement.nodeName &&
-              document.fullscreenElement.nodeName.toLowerCase() === 'div')
-            return document.fullscreenElement;
-          else return document.body;
-        }}
-      >
+      <ReactModal {...this.props}>
         {this.props.children}
       </ReactModal>
     );

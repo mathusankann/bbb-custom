@@ -1,8 +1,8 @@
-@import "/imports/ui/stylesheets/variables/breakpoints";
-@import "/imports/ui/stylesheets/variables/placeholders";
+@import "../../stylesheets/variables/_all";
 
 .tabs {
-  @extend %flex-row;
+  display: flex;
+  flex-flow: row;
   justify-content: flex-start;
   @include mq($small-only) {
     width: 100%;
@@ -11,10 +11,11 @@
 }
 
 .tabList {
-  @extend %flex-column;
-  @extend %no-margin;
+  display: flex;
+  flex-flow: column;
   border: none;
   padding: 0;
+  margin: 0;
   width: calc(100% / 3);
 
   @include mq($small-only) {
@@ -35,8 +36,9 @@
 }
 
 .tabSelector {
-  @extend %flex-row;
   font-size: 0.9rem;
+  display: flex;
+  flex-flow: row;
   flex: 0 0 auto;
   justify-content: flex-start;
   border: none !important;
@@ -99,12 +101,4 @@
 
 .selectedTab {
   display: block;
-}
-
-.toggleLabel {
-  margin-right: var(--sm-padding-x);
-
-  [dir="rtl"] & {
-    margin: 0 0 0 var(--sm-padding-x);
-  }
 }

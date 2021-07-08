@@ -8,6 +8,6 @@ const WriterMenuContainer = props => <WriterMenu {...props} />;
 
 export default withModalMounter(withTracker(({ mountModal }) => ({
   closeModal: () => mountModal(null),
-  allLocales: CaptionsService.getAvailableLocales(),
+  availableLocales: CaptionsService.getAvailableLocales(),
   takeOwnership: locale => CaptionsService.takeOwnership(locale),
 }))(WriterMenuContainer));

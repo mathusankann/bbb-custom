@@ -5,8 +5,11 @@ import { withModalMounter } from '/imports/ui/components/modal/service';
 import PropTypes from 'prop-types';
 import Modal from '/imports/ui/components/modal/simple/component';
 import Button from '/imports/ui/components/button/component';
-import LocalesDropdown from '/imports/ui/components/locales-dropdown/component';
 import { styles } from './styles';
+
+const DEFAULT_VALUE = 'select';
+
+const DEFAULT_KEY = -1;
 
 const intlMessages = defineMessages({
   closeLabel: {
@@ -45,7 +48,7 @@ const intlMessages = defineMessages({
 
 const propTypes = {
   takeOwnership: PropTypes.func.isRequired,
-  allLocales: PropTypes.arrayOf(PropTypes.object).isRequired,
+  availableLocales: PropTypes.arrayOf(PropTypes.object).isRequired,
   closeModal: PropTypes.func.isRequired,
   intl: PropTypes.shape({
     formatMessage: PropTypes.func.isRequired,
@@ -55,10 +58,10 @@ const propTypes = {
 class WriterMenu extends PureComponent {
   constructor(props) {
     super(props);
-    const { allLocales, intl } = this.props;
+    const { availableLocales, intl } = this.props;
 
-    const candidate = allLocales.filter(
-      (l) => l.locale.substring(0, 2) === intl.locale.substring(0, 2),
+    const candidate = availableLocales.filter(
+      l => l.locale.substring(0, 2) === intl.locale.substring(0, 2),
     );
 
     this.state = {
@@ -80,7 +83,6 @@ class WriterMenu extends PureComponent {
     takeOwnership(locale);
     Session.set('captionsLocale', locale);
     Session.set('openPanel', 'captions');
-    window.dispatchEvent(new Event('panelChanged'));
 
     closeModal();
   }
@@ -88,12 +90,12 @@ class WriterMenu extends PureComponent {
   render() {
     const {
       intl,
-      allLocales,
+      availableLocales,
       closeModal,
     } = this.props;
 
     const { locale } = this.state;
-
+    const defaultLocale = locale || DEFAULT_VALUE;
     return (
       <Modal
         overlayClassName={styles.overlay}
@@ -116,16 +118,21 @@ class WriterMenu extends PureComponent {
             htmlFor="captionsLangSelector"
             aria-label={intl.formatMessage(intlMessages.ariaSelect)}
           />
-
-          <LocalesDropdown
-            allLocales={allLocales}
-            handleChange={this.handleChange}
-            value={locale}
-            elementId="captionsLangSelector"
-            elementClass={styles.select}
-            selectMessage={intl.formatMessage(intlMessages.select)}
-          />
-
+          <select
+            id="captionsLangSelector"
+            className={styles.select}
+            onChange={this.handleChange}
+            defaultValue={defaultLocale}
+          >
+            <option disabled key={DEFAULT_KEY} value={DEFAULT_VALUE}>
+              {intl.formatMessage(intlMessages.select)}
+            </option>
+            {availableLocales.map(localeItem => (
+              <option key={localeItem.locale} value={localeItem.locale}>
+                {localeItem.name}
+              </option>
+            ))}
+          </select>
           <Button
             className={styles.startBtn}
             label={intl.formatMessage(intlMessages.start)}

@@ -4,27 +4,18 @@ import { withTracker } from 'meteor/react-meteor-data';
 import AnnotationGroupService from './service';
 import AnnotationGroup from './component';
 
-const AnnotationGroupContainer = ({
-  annotationsInfo, width, height, whiteboardId,
-}) => (
+const AnnotationGroupContainer = props => (
   <AnnotationGroup
-    annotationsInfo={annotationsInfo}
-    slideWidth={width}
-    slideHeight={height}
-    whiteboardId={whiteboardId}
+    annotationsInfo={props.annotationsInfo}
+    slideWidth={props.width}
+    slideHeight={props.height}
+    whiteboardId={props.whiteboardId}
   />
 );
 
 export default withTracker((params) => {
-  const {
-    whiteboardId,
-    published,
-  } = params;
-
-  const fetchFunc = published
-    ? AnnotationGroupService.getCurrentAnnotationsInfo : AnnotationGroupService.getUnsetAnnotations;
-
-  const annotationsInfo = fetchFunc(whiteboardId);
+  const { whiteboardId } = params;
+  const annotationsInfo = AnnotationGroupService.getCurrentAnnotationsInfo(whiteboardId);
   return {
     annotationsInfo,
   };

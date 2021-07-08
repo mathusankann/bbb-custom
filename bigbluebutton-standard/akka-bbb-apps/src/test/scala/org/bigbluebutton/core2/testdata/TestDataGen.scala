@@ -14,7 +14,7 @@ object TestDataGen {
       RandomStringGenerator.randomAlphanumericString(10) + ".png"
 
     val ru = RegisteredUsers.create(userId = id, extId, name, role,
-      authToken, avatarURL, guest, authed, GuestStatus.ALLOW, false)
+      authToken, avatarURL, guest, authed, GuestStatus.ALLOW)
 
     RegisteredUsers.add(users, ru)
     ru

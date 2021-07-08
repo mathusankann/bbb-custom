@@ -47,31 +47,20 @@ module BigBlueButton
       # In order to handle portrait docs better, scale to a square based on
       # the larger of height, width in the resize parameter.
       scale = resize.split('x').map(&:to_i).max
-      BigBlueButton.logger.info('Task: Extracting a page from pdf file as png image')
+      BigBlueButton.logger.info("Task: Extracting a page from pdf file as png image")
       temp_out = "#{File.dirname(png_out)}/temp-#{File.basename(png_out, '.png')}"
-      status = BigBlueButton.execute(
-        [
-          'pdftocairo', '-png', '-f', page_num.to_s, '-l', page_num.to_s, '-scale-to', scale.to_s, '-singlefile',
-          pdf_presentation, temp_out,
-        ],
-        false
-      )
-      temp_out += '.png'
-      if status.success? && File.exist?(temp_out)
+      command = "pdftocairo -png -f #{page_num} -l #{page_num} -scale-to #{scale} -singlefile #{pdf_presentation} #{temp_out}"
+      status = BigBlueButton.execute(command, false)
+      temp_out += ".png"
+      if status.success? and File.exist?(temp_out)
         # Resize to the requested size
-        status = BigBlueButton.execute(
-          [
-            'convert', temp_out, '-resize', "#{scale}x#{scale}", '-quality', '90', '+dither', '-depth', '8', '-colors', '256',
-            png_out,
-          ],
-          false
-        )
+        command = "convert #{temp_out} -resize #{scale}x#{scale} -quality 90 +dither -depth 8 -colors 256 #{png_out}"
+        status = BigBlueButton.execute(command, false)
       end
-      if !status.success? || !File.exist?(png_out)
+      if !status.success? or !File.exist?(png_out)
         # If page extraction failed, generate a blank white image
-        BigBlueButton.execute(
-          ['convert', '-size', resize, 'xc:white', '-quality', '90', '+dither', '-depth', '8', '-colors', '256', png_out]
-        )
+        command = "convert -size #{resize} xc:white -quality 90 +dither -depth 8 -colors 256 #{png_out}"
+        BigBlueButton.execute(command)
       end
     ensure
       FileUtils.rm_f(temp_out)

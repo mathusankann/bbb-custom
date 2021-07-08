@@ -7,7 +7,7 @@ import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
 
 const CAPTIONS_CONFIG = Meteor.settings.public.captions;
-const CAPTIONS_TOKEN = '_cc_';
+const CAPTIONS = '_captions_';
 const LINE_BREAK = '\n';
 const ROLE_MODERATOR = Meteor.settings.public.user.role_moderator;
 
@@ -19,7 +19,7 @@ const getActiveCaptions = () => {
 
 const getCaptions = locale => Captions.findOne({
   meetingId: Auth.meetingID,
-  padId: { $regex: `${CAPTIONS_TOKEN}${locale}$` },
+  padId: { $regex: `${CAPTIONS}${locale}$` },
 });
 
 const getCaptionsData = () => {
@@ -43,7 +43,6 @@ const getAvailableLocales = () => {
   const { meetingID } = Auth;
   const locales = [];
   Captions.find({ meetingId: meetingID },
-    { sort: { locale: 1 } },
     { fields: { ownerId: 1, locale: 1 } })
     .forEach((caption) => {
       if (caption.ownerId === '') {
@@ -118,10 +117,7 @@ const getCaptionsSettings = () => {
   return settings;
 };
 
-const isCaptionsEnabled = () => {
-  const captions = Captions.findOne({ meetingId: Auth.meetingID });
-  return CAPTIONS_CONFIG.enabled && captions;
-};
+const isCaptionsEnabled = () => CAPTIONS_CONFIG.enabled;
 
 const isCaptionsAvailable = () => {
   if (isCaptionsEnabled) {
@@ -174,7 +170,6 @@ const initSpeechRecognition = (locale) => {
 };
 
 export default {
-  CAPTIONS_TOKEN,
   getCaptionsData,
   getAvailableLocales,
   getOwnedLocales,

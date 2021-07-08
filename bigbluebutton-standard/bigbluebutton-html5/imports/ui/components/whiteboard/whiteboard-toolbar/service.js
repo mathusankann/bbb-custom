@@ -2,10 +2,10 @@ import { makeCall } from '/imports/ui/services/api';
 import Storage from '/imports/ui/services/storage/session';
 import Users from '/imports/api/users';
 import Auth from '/imports/ui/services/auth';
+import WhiteboardMultiUser from '/imports/api/whiteboard-multi-user/';
 import getFromUserSettings from '/imports/ui/services/users-settings';
 
 const DRAW_SETTINGS = 'drawSettings';
-const PALM_REJECTION_MODE = 'palmRejectionMode';
 const WHITEBOARD_TOOLBAR = Meteor.settings.public.whiteboard.toolbar;
 
 const makeSetter = key => (value) => {
@@ -26,19 +26,6 @@ const clearWhiteboard = (whiteboardId) => {
 
 const changeWhiteboardMode = (multiUser, whiteboardId) => {
   makeCall('changeWhiteboardAccess', multiUser, whiteboardId);
-};
-
-const getCurrentPalmRejectionMode = () => Storage.getItem(PALM_REJECTION_MODE);
-
-const setInitialPalmRejectionMode = (palmRejectionMode) => {
-  const _palmRejectionMode = Storage.getItem(PALM_REJECTION_MODE);
-  if (!_palmRejectionMode) {
-    Storage.setItem(PALM_REJECTION_MODE, palmRejectionMode);
-  }
-};
-
-const setPalmRejectionMode = (palmRejectionMode) => {
-  Storage.setItem(PALM_REJECTION_MODE, palmRejectionMode);
 };
 
 const setInitialWhiteboardToolbarValues = (tool, thickness, color, fontSize, textShape) => {
@@ -72,6 +59,11 @@ const getTextShapeActiveId = () => {
   return drawSettings ? drawSettings.textShape.textShapeActiveId : '';
 };
 
+const getMultiUserStatus = (whiteboardId) => {
+  const data = WhiteboardMultiUser.findOne({ meetingId: Auth.meetingID, whiteboardId });
+  return data ? data.multiUser : false;
+};
+
 const isPresenter = () => {
   const currentUser = Users.findOne({ userId: Auth.userID }, { fields: { presenter: 1 } });
   return currentUser ? currentUser.presenter : false;
@@ -79,11 +71,10 @@ const isPresenter = () => {
 
 const filterAnnotationList = () => {
   const multiUserPenOnly = getFromUserSettings('bbb_multi_user_pen_only', WHITEBOARD_TOOLBAR.multiUserPenOnly);
-  const amIPresenter = isPresenter();
 
   let filteredAnnotationList = WHITEBOARD_TOOLBAR.tools;
 
-  if (!amIPresenter && multiUserPenOnly) {
+  if (!isPresenter() && multiUserPenOnly) {
     filteredAnnotationList = [{
       icon: 'pen_tool',
       value: 'pencil',
@@ -91,13 +82,13 @@ const filterAnnotationList = () => {
   }
 
   const presenterTools = getFromUserSettings('bbb_presenter_tools', WHITEBOARD_TOOLBAR.presenterTools);
-  if (amIPresenter && Array.isArray(presenterTools)) {
+  if (isPresenter() && Array.isArray(presenterTools)) {
     filteredAnnotationList = WHITEBOARD_TOOLBAR.tools.filter(el =>
       presenterTools.includes(el.value));
   }
 
   const multiUserTools = getFromUserSettings('bbb_multi_user_tools', WHITEBOARD_TOOLBAR.multiUserTools);
-  if (!amIPresenter && !multiUserPenOnly && Array.isArray(multiUserTools)) {
+  if (!isPresenter() && !multiUserPenOnly && Array.isArray(multiUserTools)) {
     filteredAnnotationList = WHITEBOARD_TOOLBAR.tools.filter(el =>
       multiUserTools.includes(el.value));
   }
@@ -109,9 +100,6 @@ export default {
   undoAnnotation,
   clearWhiteboard,
   changeWhiteboardMode,
-  getCurrentPalmRejectionMode,
-  setInitialPalmRejectionMode,
-  setPalmRejectionMode,
   setInitialWhiteboardToolbarValues,
   getCurrentDrawSettings,
   setFontSize,
@@ -120,6 +108,7 @@ export default {
   setColor,
   setTextShapeObject,
   getTextShapeActiveId,
+  getMultiUserStatus,
   isPresenter,
   filterAnnotationList,
 };

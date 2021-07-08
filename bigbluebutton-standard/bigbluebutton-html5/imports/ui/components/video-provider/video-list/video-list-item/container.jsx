@@ -13,7 +13,6 @@ export default withTracker((props) => {
   } = props;
 
   return {
-    voiceUser: VoiceUsers.findOne({ intId: userId },
-      { fields: { 'muted': 1, 'listenOnly': 1, 'talking': 1 } }),
+    voiceUser: VoiceUsers.findOne({ intId: userId }),
   };
 })(VideoListItemContainer);

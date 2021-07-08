@@ -39,12 +39,9 @@ class JoinHandler extends Component {
         status,
       } = Meteor.status();
 
-      if (status === 'connecting') {
-        this.setState({ joined: false });
-      }
-
       logger.debug(`Initial connection status change. status: ${status}, connected: ${connected}`);
       if (connected) {
+        c.stop();
 
         const msToConnect = (new Date() - this.firstJoinTime) / 1000;
         const secondsToConnect = parseFloat(msToConnect).toFixed(2);

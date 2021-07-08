@@ -1,4 +1,7 @@
 @import "/imports/ui/stylesheets/variables/_all";
+@import "/imports/ui/stylesheets/variables/general";
+@import "/imports/ui/stylesheets/variables/palette";
+@import "/imports/ui/stylesheets/variables/typography";
 @import '/imports/ui/stylesheets/mixins/_indicators';
 
 :root {
@@ -11,34 +14,37 @@
 }
 
 .main {
-  @extend %flex-column;
   position: relative;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar {
   position: relative;
   text-align: center;
+
   font-size: 1.5rem;
   padding: var(--bars-padding) var(--bars-padding) 0 var(--bars-padding);
   height: 7rem;
 }
 
 .wrapper {
-  @extend %flex-column;
   position: relative;
+  display: flex;
   flex: 1;
+  flex-direction: column;
   overflow: hidden;
 
   @include mq($medium-up) {
-    flex-flow: row;
+    flex-direction: row;
   }
 }
 
 %full-page {
   position: absolute;
   display: flex;
-  flex-flow: column;
+  flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
 
@@ -75,10 +81,12 @@
 
   &:before {
     top: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, .45) -20%, transparent 20%);
   }
 
   &:after {
     bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, .45) -20%, transparent 20%);
   }
 
   @include mq($medium-up) {
@@ -98,9 +106,9 @@
 .userList {
   @extend %full-page;
   @extend %text-elipsis;
-  @extend %highContrastOutline;
+  @include highContrastOutline();
   outline-style: solid;
-  z-index: 5;
+  z-index: 2;
   overflow: visible;
   order: 1;
 
@@ -111,12 +119,12 @@
   @include mq($medium-up) {
     flex: 0 15vw;
     order: 1;
-    height: 100%;
+    height: 100vh;
   }
 
   @include mq($xlarge-up) {
     flex-basis: 10vw;
-    height: 100%;
+    height: 100vh;
   }
 }
 
@@ -135,24 +143,24 @@
 .captions,
 .chat {
   @extend %full-page;
-  @extend %highContrastOutline;
+  @include highContrastOutline();
   outline-style: solid;
   order: 2;
   height: 100%;
   @include mq($small-only) {
-    z-index: 5;
+    z-index: 3;
     height: auto;
     top: var(--navbar-height);
     overflow: visible;
   }
 
   @include mq($medium-up) {
-    // flex: 0 25vw;
+    flex: 0 25vw;
     order: 1;
   }
 
   @include mq($xlarge-up) {
-    // flex-basis: 20vw;
+    flex-basis: 20vw;
   }
 }
 
@@ -160,18 +168,14 @@
   background-color: var(--color-white);
   min-width: var(--poll-pane-min-width);
   padding: 1rem;
-
-  @include mq($small-only) {
-    overflow: auto;
-  }
 }
 
 .breakoutRoom {
   height: 100%;
-  // width: 20vw;
+  width: 20vw;
   background-color: var(--color-white);
   @include mq($small-only) {
-    // width: auto;
+    width: auto;
     height: auto;
   }
 }

@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, intlShape } from 'react-intl';
 import { withModalMounter } from '/imports/ui/components/modal/service';
 import Modal from '/imports/ui/components/modal/fullscreen/component';
 import logger from '/imports/startup/client/logger';
 import PropTypes from 'prop-types';
 import AudioService from '../audio/service';
 import VideoService from '../video-provider/service';
-import { screenshareHasEnded } from '/imports/ui/components/screenshare/service';
-import UserListService from '/imports/ui/components/user-list/service';
 import { styles } from './styles';
 
 const intlMessages = defineMessages({
@@ -42,7 +40,7 @@ const intlMessages = defineMessages({
 });
 
 const propTypes = {
-  intl: PropTypes.object.isRequired,
+  intl: intlShape.isRequired,
   breakout: PropTypes.objectOf(Object).isRequired,
   getURL: PropTypes.func.isRequired,
   mountModal: PropTypes.func.isRequired,
@@ -100,8 +98,8 @@ class BreakoutJoinConfirmation extends Component {
     const urlFromSelectedRoom = getURL(selectValue);
     const url = isFreeJoin ? urlFromSelectedRoom : breakoutURL;
 
-    // leave main room's audio, and stops video and screenshare when joining a breakout room
     if (voiceUserJoined) {
+      // leave main room's audio when joining a breakout room
       AudioService.exitAudio();
       logger.info({
         logCode: 'breakoutjoinconfirmation_ended_audio',
@@ -109,9 +107,7 @@ class BreakoutJoinConfirmation extends Component {
       }, 'joining breakout room closed audio in the main room');
     }
 
-    VideoService.storeDeviceIds();
     VideoService.exitVideo();
-    if (UserListService.amIPresenter()) screenshareHasEnded();
     if (url === '') {
       logger.error({
         logCode: 'breakoutjoinconfirmation_redirecting_to_url',

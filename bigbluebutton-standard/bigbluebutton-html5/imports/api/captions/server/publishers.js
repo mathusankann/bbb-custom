@@ -1,18 +1,14 @@
 import Captions from '/imports/api/captions';
 import { Meteor } from 'meteor/meteor';
 import Logger from '/imports/startup/server/logger';
-import AuthTokenValidation, { ValidationStates } from '/imports/api/auth-token-validation';
+import { extractCredentials } from '/imports/api/common/server/helpers';
 
 function captions() {
-  const tokenValidation = AuthTokenValidation.findOne({ connectionId: this.connection.id });
-
-  if (!tokenValidation || tokenValidation.validationStatus !== ValidationStates.VALIDATED) {
-    Logger.warn(`Publishing Captions was requested by unauth connection ${this.connection.id}`);
+  if (!this.userId) {
     return Captions.find({ meetingId: '' });
   }
-
-  const { meetingId, userId } = tokenValidation;
-  Logger.debug('Publishing Captions', { meetingId, requestedBy: userId });
+  const { meetingId } = extractCredentials(this.userId);
+  Logger.debug('Publishing Captions', { meetingId });
 
   return Captions.find({ meetingId });
 }

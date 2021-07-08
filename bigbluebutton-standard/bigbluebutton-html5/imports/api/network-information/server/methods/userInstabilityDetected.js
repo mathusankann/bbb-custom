@@ -5,9 +5,6 @@ import { extractCredentials } from '/imports/api/common/server/helpers';
 
 export default function userInstabilityDetected(sender) {
   const { meetingId, requesterUserId: receiver } = extractCredentials(this.userId);
-
-  check(meetingId, String);
-  check(receiver, String);
   check(sender, String);
 
   const payload = {

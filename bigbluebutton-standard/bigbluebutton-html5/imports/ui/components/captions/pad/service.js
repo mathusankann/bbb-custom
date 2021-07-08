@@ -1,3 +1,4 @@
+import Users from '/imports/api/users';
 import Auth from '/imports/ui/services/auth';
 import Settings from '/imports/ui/services/settings';
 
@@ -9,9 +10,11 @@ const getLang = () => {
 };
 
 const getPadParams = () => {
-  let config = {};
+  const { config } = NOTE_CONFIG;
+  const User = Users.findOne({ userId: Auth.userID }, { fields: { name: 1, color: 1 } });
+  config.userName = User.name;
+  config.userColor = User.color;
   config.lang = getLang();
-  config.rtl = document.documentElement.getAttribute('dir') === 'rtl';
 
   const params = [];
   Object.keys(config).forEach((k) => {
@@ -23,12 +26,12 @@ const getPadParams = () => {
 
 const getPadURL = (padId, readOnlyPadId, ownerId) => {
   const userId = Auth.userID;
-  const params = getPadParams();
   let url;
-  if (!ownerId || userId === ownerId) {
+  if (!ownerId || (ownerId && userId === ownerId)) {
+    const params = getPadParams();
     url = Auth.authenticateURL(`${NOTE_CONFIG.url}/p/${padId}?${params}`);
   } else {
-    url = Auth.authenticateURL(`${NOTE_CONFIG.url}/p/${readOnlyPadId}?${params}`);
+    url = Auth.authenticateURL(`${NOTE_CONFIG.url}/p/${readOnlyPadId}`);
   }
   return url;
 };

@@ -16,7 +16,10 @@ trait SendGroupChatMessageMsgHdlr {
   def handle(msg: SendGroupChatMessageMsg, state: MeetingState2x,
              liveMeeting: LiveMeeting, bus: MessageBus): MeetingState2x = {
 
-    var chatLocked: Boolean = false
+    log.debug("RECEIVED PUBLIC CHAT MESSAGE")
+    log.debug("NUM GROUP CHATS = " + state.groupChats.findAllPublicChats().length)
+
+    var chatLocked: Boolean = false;
 
     for {
       user <- Users2x.findWithIntId(liveMeeting.users2x, msg.header.userId)
@@ -67,6 +70,20 @@ trait SendGroupChatMessageMsgHdlr {
         val event = GroupChatMessageBroadcastEvtMsg(header, body)
 
         BbbCommonEnvCoreMsg(envelope, event)
+      }
+
+      GroupChatApp.findGroupChatUser(msg.header.userId, liveMeeting.users2x) match {
+        case Some(s) => log.debug("Found sender")
+        case None    => log.debug("NOT FOUND sender")
+      }
+
+      state.groupChats.find(msg.body.chatId) match {
+        case Some(c) => log.debug("FOUND CHAT ID " + c.id)
+        case None    => log.debug("NOT FOUND CHAT ID " + msg.body.chatId)
+      }
+
+      state.groupChats.chats.values.toVector foreach { ch =>
+        log.debug("CHAT = " + ch.id)
       }
 
       val newState = for {

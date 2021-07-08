@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { defineMessages } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import PropTypes from 'prop-types';
 
 import Modal from '/imports/ui/components/modal/simple/component';
@@ -9,7 +9,7 @@ import Service from './service';
 import { styles } from './styles';
 
 const propTypes = {
-  intl: PropTypes.object.isRequired,
+  intl: intlShape.isRequired,
   meetingId: PropTypes.string.isRequired,
   requesterUserId: PropTypes.string.isRequired,
 };
