@@ -49,7 +49,7 @@ done
 
 DOMAIN=""
 while [[ -z "$DOMAIN" ]]; do
-    read -p "Please enter the domain name: " DOMAIN
+    read -p "Bitte geben Sie den Domainnamne ein: " DOMAIN
 done
 
 recording="n"
@@ -66,14 +66,14 @@ done
 
 ip_correct=""
 while [[ ! $ip_correct =~ ^(y|n)$ ]]; do
-    read -p "Is $EXTERNAL_IPv4 your external IPv4 address? (y/n): " ip_correct
+    read -p "Is $EXTERNAL_IPv4 ist dies Ihre externe IPv4-Addresse? (y/n): " ip_correct
 done
 
 if [ ! "$ip_correct" == "y" ]
 then
     EXTERNAL_IPv4=""
     while [[ ! $EXTERNAL_IPv4 =~ ^[1-9][0-9]{0,2}\.[0-9]{0,3}\.[0-9]{0,3}\.[1-9][0-9]{0,2}$ ]]; do
-        read -p "Please enter correct IPv4 address: " EXTERNAL_IPv4
+        read -p "Bitte geben Sie die korrekte IPv4 addresse ein: " EXTERNAL_IPv4
     done
 fi
 
@@ -81,14 +81,14 @@ if [ -n "$EXTERNAL_IPv6" ]
 then
     ip_correct=""
     while [[ ! $ip_correct =~ ^(y|n)$ ]]; do
-        read -p "Is $EXTERNAL_IPv6 your external IPv6 address? (y/n): " ip_correct
+        read -p "Is $EXTERNAL_IPv6 ist dies Ihre externe IPv4-Addresse? (y/n): " ip_correct
     done
 
     if [ ! "$ip_correct" == "y" ]
     then
         EXTERNAL_IPv6=""
         while [[ ! $EXTERNAL_IPv6 =~ ^[0-9a-z:]{3,39}$ ]]; do
-            read -p "Please enter correct IPv6 address: " EXTERNAL_IPv6
+            read -p "Bitte geben Sie die korrekte IPv6s addresse ein: " EXTERNAL_IPv6
         done
     fi
 fi
