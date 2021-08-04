@@ -4,9 +4,9 @@ public:
     desktopFontSize: 14px
     audioChatNotification: false
     autoJoin: true
-    listenOnlyMode: false
+    listenOnlyMode: {{ .Env.LISTEN_ONLY_MODE }}
     forceListenOnly: false
-    skipCheck: true
+    skipCheck: {{ .Env.DISABLE_ECHO_TEST }}
     clientTitle: {{ .Env.CLIENT_TITLE }}
     appName: BigBlueButton HTML5 Client
     bbbServerVersion: 2.2
@@ -90,7 +90,7 @@ public:
       - danger
       - warning
   externalVideoPlayer:
-    enabled: false
+    enabled: true
   networkMonitoring:
     enableNetworkMonitoring: false
     packetLostThreshold: 10
@@ -184,12 +184,12 @@ public:
         name: High definition
         default: false
         bitrate: 800
-    enableScreensharing: false
+    enableScreensharing: true
     enableVideo: true
     enableVideoMenu: true
-    enableListenOnly: false
-    autoShareWebcam: true
-    skipVideoPreview: true
+    enableListenOnly: true
+    autoShareWebcam: {{ .Env.AUTO_SHARE_WEBCAM }}
+    skipVideoPreview: {{ .Env.DISABLE_VIDEO_PREVIEW }}
     # Entry `thresholds` is an array of:
     # - threshold: minimum number of cameras being shared for profile to applied
     #   profile: a camera profile id from the cameraProfiles configuration array
@@ -244,9 +244,9 @@ public:
     lines: 2
     time: 5000
   chat:
-    enabled: false
+    enabled: {{ .Env.CHAT_ENABLED }}
     bufferChatInsertsMs: 0
-    startClosed: true
+    startClosed: {{ .Env.CHAT_START_CLOSED }}
     min_message_length: 1
     max_message_length: 5000
     grouping_messages_window: 10000
@@ -265,17 +265,17 @@ public:
     typingIndicator:
       enabled: true
   note:
-    enabled: false
+    enabled: true
     url: https://{{ .Env.DOMAIN }}/pad
     config:
       showLineNumbers: false
       showChat: false
       noColors: true
-      showControls: false
+      showControls: true
       rtl: false
   layout:
-    autoSwapLayout: true
-    hidePresentation: true
+    autoSwapLayout: false
+    hidePresentation: false
   media:
     stunTurnServersFetchAddress: "/bigbluebutton/api/stuns"
     cacheStunTurnServers: true
