@@ -22,12 +22,12 @@ fi
 EXTERNAL_IPv4=$(curl -4 -s https://icanhazip.com)
 EXTERNAL_IPv6=$(curl -6 -s https://icanhazip.com || true)
 
-greenlight=""
+greenlight="y"
 while [[ ! $greenlight =~ ^(y|n)$ ]]; do
     read -p "Should greenlight be included? (y/n): " greenlight
 done
 
-https_proxy=""
+https_proxy="n"
 while [[ ! $https_proxy =~ ^(y|n)$ ]]; do
     read -p "Should an automatic HTTPS Proxy be included? (y/n): " https_proxy
 done
@@ -42,7 +42,7 @@ coturn=""
 #     done
 # fi
 
-prometheus_exporter=""
+prometheus_exporter="n"
 while [[ ! $prometheus_exporter =~ ^(y|n)$ ]]; do
     read -p "Should a Prometheus exporter be included? (y/n): " prometheus_exporter
 done
@@ -52,7 +52,7 @@ while [[ -z "$DOMAIN" ]]; do
     read -p "Please enter the domain name: " DOMAIN
 done
 
-recording=""
+recording="n"
 echo "Should the recording feature be included?"
 echo "   IMPORTANT: this is currently a big privacy issues, because it will "
 echo "   record everything which happens in the conference, even when the button"
@@ -139,11 +139,11 @@ sed -i "s/SHARED_SECRET=.*/SHARED_SECRET=$RANDOM_1/" .env
 sed -i "s/ETHERPAD_API_KEY=.*/ETHERPAD_API_KEY=$RANDOM_2/" .env
 sed -i "s/RAILS_SECRET=.*/RAILS_SECRET=$RANDOM_3/" .env
 
-echo "--------------------------------------------------"
-echo "configuration file .env got successfully created!"
-echo ""
-echo "you can look through it for further adjusments"
-echo "  $ nano .env"
-echo ""
-echo "to start bigbluebutton run"
-echo "  $ ./scripts/compose up -d"
+#echo "--------------------------------------------------"
+#echo "configuration file .env got successfully created!"
+#echo ""
+#echo "you can look through it for further adjusments"
+#echo "  $ nano .env"
+#echo ""
+#echo "to start bigbluebutton run"
+#echo "  $ ./scripts/compose up -d"
