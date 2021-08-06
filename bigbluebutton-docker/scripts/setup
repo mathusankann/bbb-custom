@@ -22,12 +22,12 @@ fi
 EXTERNAL_IPv4=$(curl -4 -s https://icanhazip.com)
 EXTERNAL_IPv6=$(curl -6 -s https://icanhazip.com || true)
 
-greenlight="y"
+greenlight=""
 while [[ ! $greenlight =~ ^(y|n)$ ]]; do
     read -p "Should greenlight be included? (y/n): " greenlight
 done
 
-https_proxy="n"
+https_proxy=""
 while [[ ! $https_proxy =~ ^(y|n)$ ]]; do
     read -p "Should an automatic HTTPS Proxy be included? (y/n): " https_proxy
 done
@@ -42,17 +42,17 @@ coturn=""
 #     done
 # fi
 
-prometheus_exporter="n"
+prometheus_exporter=""
 while [[ ! $prometheus_exporter =~ ^(y|n)$ ]]; do
     read -p "Should a Prometheus exporter be included? (y/n): " prometheus_exporter
 done
 
 DOMAIN=""
 while [[ -z "$DOMAIN" ]]; do
-    read -p "Bitte geben Sie den Domainnamne ein: " DOMAIN
+    read -p "Please enter the domain name: " DOMAIN
 done
 
-recording="n"
+recording=""
 echo "Should the recording feature be included?"
 echo "   IMPORTANT: this is currently a big privacy issues, because it will "
 echo "   record everything which happens in the conference, even when the button"
@@ -66,14 +66,14 @@ done
 
 ip_correct=""
 while [[ ! $ip_correct =~ ^(y|n)$ ]]; do
-    read -p "Is $EXTERNAL_IPv4 ist dies Ihre externe IPv4-Addresse? (y/n): " ip_correct
+    read -p "Is $EXTERNAL_IPv4 your external IPv4 address? (y/n): " ip_correct
 done
 
 if [ ! "$ip_correct" == "y" ]
 then
     EXTERNAL_IPv4=""
     while [[ ! $EXTERNAL_IPv4 =~ ^[1-9][0-9]{0,2}\.[0-9]{0,3}\.[0-9]{0,3}\.[1-9][0-9]{0,2}$ ]]; do
-        read -p "Bitte geben Sie die korrekte IPv4 addresse ein: " EXTERNAL_IPv4
+        read -p "Please enter correct IPv4 address: " EXTERNAL_IPv4
     done
 fi
 
@@ -81,14 +81,14 @@ if [ -n "$EXTERNAL_IPv6" ]
 then
     ip_correct=""
     while [[ ! $ip_correct =~ ^(y|n)$ ]]; do
-        read -p "Is $EXTERNAL_IPv6 ist dies Ihre externe IPv4-Addresse? (y/n): " ip_correct
+        read -p "Is $EXTERNAL_IPv6 your external IPv6 address? (y/n): " ip_correct
     done
 
     if [ ! "$ip_correct" == "y" ]
     then
         EXTERNAL_IPv6=""
         while [[ ! $EXTERNAL_IPv6 =~ ^[0-9a-z:]{3,39}$ ]]; do
-            read -p "Bitte geben Sie die korrekte IPv6s addresse ein: " EXTERNAL_IPv6
+            read -p "Please enter correct IPv6 address: " EXTERNAL_IPv6
         done
     fi
 fi
@@ -139,11 +139,11 @@ sed -i "s/SHARED_SECRET=.*/SHARED_SECRET=$RANDOM_1/" .env
 sed -i "s/ETHERPAD_API_KEY=.*/ETHERPAD_API_KEY=$RANDOM_2/" .env
 sed -i "s/RAILS_SECRET=.*/RAILS_SECRET=$RANDOM_3/" .env
 
-#echo "--------------------------------------------------"
+echo "--------------------------------------------------"
 echo "configuration file .env got successfully created!"
-#echo ""
-##echo "you can look through it for further adjusments"
-#echo "  $ nano .env"
-#echo ""
-#echo "to start bigbluebutton run"
-#echo "  $ ./scripts/compose up -d"
+echo ""
+echo "you can look through it for further adjusments"
+echo "  $ nano .env"
+echo ""
+echo "to start bigbluebutton run"
+echo "  $ ./scripts/compose up -d"
