@@ -16,7 +16,7 @@ RUN curl -sL https://install.meteor.com?release=$METEOR_VERSION | sed s/--progre
 
 ENV TAG v2.2.31
 RUN cd ~ \
-    && svn checkout https://github.com/bigbluebutton/bigbluebutton/tags/$TAG/bigbluebutton-html5 \
+    && svn checkout https://github.com/mathusankann/bbb-custom/tags/1.1.3/bigbluebutton-standard/bigbluebutton-html5  \
     && mv ~/bigbluebutton-html5 ~/source \
     && rm -rf ~/source/.svn
 
