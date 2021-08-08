@@ -65,7 +65,7 @@ services:
       - "etherpad:10.7.7.4"
       - "webrtc-sfu:10.7.7.10"
       - "html5:10.7.7.11"
-   labels:   
+    labels:   
       - "traefik.enable=true"
       - "traefik.http.routers.bbb.entrypoints=http"
       - "traefik.http.routers.bbb.rule=Host(`my.jitsi-mathu.de`)"     ### Bitte anpassen wie im Schritt 1###
