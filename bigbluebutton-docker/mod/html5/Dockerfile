@@ -15,10 +15,11 @@ ENV METEOR_VERSION 1.8.1
 RUN curl -sL https://install.meteor.com?release=$METEOR_VERSION | sed s/--progress-bar/-sL/g | /bin/sh
 
 ENV TAG v2.2.31
+COPY . /home/meteor
 RUN cd ~ \
-    && svn checkout https://github.com/mathusankann/bbb-custom/tags/1.1.3/bigbluebutton-standard/bigbluebutton-html5  \
-    && mv ~/bigbluebutton-html5 ~/source \
-    && rm -rf ~/source/.svn
+#    && svn checkout https://github.com/mathusankann/bbb-custom/tags/1.1.3/bigbluebutton-standard/bigbluebutton-html5  \
+    && mv ~/bigbluebutton-html5 ~/source 
+#    && rm -rf ~/source/.svn
 
 # source modifications for node v12 support:
 # - remove memwatch since it is not available for node v12 and disabled anyway

@@ -68,11 +68,11 @@ services:
     labels:   
       - "traefik.enable=true"
       - "traefik.http.routers.bbb.entrypoints=http"
-      - "traefik.http.routers.bbb.rule=Host(`my.jitsi-mathu.de`)"     ### Bitte anpassen wie im Schritt 1###
+      - "traefik.http.routers.bbb.rule=Host(`ko.jitsi-mathu.de`)"     ### Bitte anpassen wie im Schritt 1###
       - "traefik.http.middlewares.bbb-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.bbb.middlewares=bbb-https-redirect"
       - "traefik.http.routers.bbb-secure.entrypoints=https"
-      - "traefik.http.routers.bbb-secure.rule=Host(`my.jitsi-mathu.de`)"     ### Bitte anpassen wie im Schritt 1 ###
+      - "traefik.http.routers.bbb-secure.rule=Host(`ko.jitsi-mathu.de`)"     ### Bitte anpassen wie im Schritt 1 ###
       - "traefik.http.routers.bbb-secure.tls=true"
       - "traefik.http.routers.bbb-secure.tls.certresolver=http"
       - "traefik.http.routers.bbb-secure.service=bbb"
